@@ -578,8 +578,13 @@ public class XLPStringUtil {
 	public static boolean endsWith(String s, String regex) {
 		if(s == null || regex == null)
 			return false;
-		String endString = findSubString(s, regex);
-		return endString == null ? false : s.endsWith(endString);
+		String[] matcheStr = findSubStrings(s, regex);
+		for (String string : matcheStr) { 
+			if (s.endsWith(string)) { 
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

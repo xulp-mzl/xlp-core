@@ -13,9 +13,9 @@ public enum EncryptType {
 	AES_128("AES", 128, 16), 
 	AES_192("AES", 192, 16), 
 	AES_256("AES", 256, 16), 
-	RC2("RC2", 128, 64), 
-	RC4("RC4", 128, 64),
-	BLOW_FISH("Blowfish", 128, 0), 
+	RC2("RC2", 128, 128), 
+	RC4("RC4", 128, 128),
+	BLOW_FISH("Blowfish", 128, 56), 
 	RIJNDAEL_128("Rijndael", 128, 16), 
 	RIJNDAEL_192("Rijndael", 192, 16), 
 	RIJNDAEL_256("Rijndael", 256, 16);

@@ -1,5 +1,11 @@
 package org.xlp.encryption;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -8,13 +14,17 @@ import java.security.Security;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.xlp.assertion.AssertUtils;
+import org.xlp.assertion.IllegalObjectException;
 import org.xlp.utils.XLPCharsetUtil;
 import org.xlp.utils.XLPStringUtil;
+import org.xlp.utils.io.XLPIOUtil;
 
 /**
  * DES 算法为密码体制中的对称密码体制，又被成为美国数据加密标准， 是1972年美国IBM公司研制的 对称密码体制加密算法。
@@ -157,7 +167,7 @@ public class SymmetricEncryption {
 	 *             假如设置的值小于0，则抛出该异常
 	 */
 	public void setKeySize(int keySize) throws EncryptException {
-		setKeySize(keySize, false); 
+		setKeySize(keySize, false);
 	}
 
 	/**
@@ -291,113 +301,356 @@ public class SymmetricEncryption {
 	/**
 	 * 根据给定的字符串，生成key
 	 * 
-	 * @param strKey 
-	 * @param charsetName 字符编码
-	 * @throws EncryptException 假如设置key失败，则抛出该异常
-	 * @throws NullPointerException 假如strKey为null或空，则抛出该异常
+	 * @param strKey
+	 * @param charsetName
+	 *            字符编码
+	 * @throws EncryptException
+	 *             假如设置key失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如strKey为null或空，则抛出该异常
 	 */
-	public void setKey(String strKey, String charsetName) throws EncryptException{
+	public void setKey(String strKey, String charsetName) throws EncryptException {
 		AssertUtils.isNotNull(strKey, "strKey param is null or empty!");
 		charsetName = XLPStringUtil.isEmpty(charsetName) ? this.charsetName : charsetName;
 		try {
-			setKey(strKey2Bytes(strKey, charsetName)); 
+			setKey(strKey2Bytes(strKey, charsetName));
 		} catch (UnsupportedEncodingException e) {
 			throw new EncryptException("不支持该字符编码", e);
 		}
 	}
-	
+
 	/**
 	 * 形成秘钥的字符串转换成字节数组
 	 * 
 	 * @param strKey
 	 * @param charsetName
 	 * @return
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
-	private byte[] strKey2Bytes(String strKey, String charsetName) throws UnsupportedEncodingException{
+	private byte[] strKey2Bytes(String strKey, String charsetName) throws UnsupportedEncodingException {
 		int byteLength = encryptType.getByteLength();
-		byte[] byteKey = new byte[byteLength];
-		if (byteLength == 0) {
-			return strKey.getBytes(charsetName); 
-		}else {
-			byte[] tempByteKey = strKey.getBytes(charsetName); 
-			int minLen = Math.min(byteLength, tempByteKey.length);
-			for (int i = 0; i < minLen; i++) {
-				byteKey[i] = tempByteKey[i];
-			}
-			return byteKey;
+		byte[] tempByteKey = strKey.getBytes(charsetName);
+		// Blowfish 的最大秘钥字节数组为56
+		if (encryptType == EncryptType.BLOW_FISH) {
+			byteLength = tempByteKey.length > 56 ? 56 : tempByteKey.length;
 		}
+		byte[] byteKey = new byte[byteLength];
+		int minLen = Math.min(byteLength, tempByteKey.length);
+		for (int i = 0; i < minLen; i++) {
+			byteKey[i] = tempByteKey[i];
+		}
+		return byteKey;
 	}
-	
+
 	/**
 	 * 根据给定的字符串，生成key
 	 * 
-	 * @param strKey 
-	 * @throws EncryptException 假如设置key失败，则抛出该异常
-	 * @throws NullPointerException 假如strKey为null或空，则抛出该异常
+	 * @param strKey
+	 * @throws EncryptException
+	 *             假如设置key失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如strKey为null或空，则抛出该异常
 	 */
-	public void setKey(String strKey) throws EncryptException{
-		setKey(strKey, null);  
+	public void setKey(String strKey) throws EncryptException {
+		setKey(strKey, null);
 	}
-	
+
 	/**
 	 * 根据给定字节数组，生成key
 	 * 
 	 * @param keyBytes
-	 * @throws NullPointerException 假如参数为null，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
 	 */
-	public void setKey(byte[] keyBytes){
+	public void setKey(byte[] keyBytes) {
 		AssertUtils.isNotNull(keyBytes, "keyBytes param is null!");
 		key = new SecretKeySpec(keyBytes, encryptType.getEncryptName());
 	}
-	
+
+	/**
+	 * 根据给定秘钥输入流，生成key
+	 * 
+	 * @param inputStream
+	 * @throws EncryptException
+	 *             假如秘钥生成失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 */
+	public void setKey(InputStream inputStream) throws EncryptException {
+		AssertUtils.isNotNull(inputStream, "inputStream param is null!");
+		try {
+			setKey(XLPIOUtil.IOToByteArray(inputStream, false));
+		} catch (IOException e) {
+			throw new EncryptException("根据输入流秘钥生成失败", e);
+		}
+	}
+
+	/**
+	 * 根据给定秘钥文件，生成key
+	 * 
+	 * @param inputFile
+	 * @throws EncryptException
+	 *             假如秘钥生成失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 * @throws IllegalObjectException
+	 *             假如给定的文件是目录或不存在，则抛出该异常
+	 */
+	public void setKey(File inputFile) throws EncryptException {
+		AssertUtils.assertFile(inputFile);
+		try {
+			setKey(XLPIOUtil.IOToByteArray(inputFile));
+		} catch (IOException e) {
+			throw new EncryptException("根据输入文件秘钥生成失败", e);
+		}
+	}
+
+	/**
+	 * 秘钥经过base64转码后形成的秘钥
+	 * 
+	 * @param base64Key
+	 * @throws NullPointerException
+	 *             假如strKey为null或空，则抛出该异常
+	 */
+	public void setBase64Key(String base64Key) {
+		AssertUtils.isNotNull(base64Key, "base64Key param is null or empty!");
+		setKey(Base64.getDecoder().decode(base64Key));
+	}
+
 	/**
 	 * 秘钥通过base64转码成字符串
 	 * 
 	 * @return
-	 * @throws EncryptException 假如秘钥获取失败，则抛出该异常
+	 * @throws EncryptException
+	 *             假如秘钥获取失败，则抛出该异常
 	 */
-	public String getStrKey() throws EncryptException{
+	public String getStrKey() throws EncryptException {
 		byte[] keyBytes = getByteArrayKey();
 		return Base64.getEncoder().encodeToString(keyBytes);
 	}
-	
+
 	/**
 	 * 获取秘钥对象
 	 * 
 	 * @return
-	 * @throws EncryptException 假如秘钥获取失败，则抛出该异常
+	 * @throws EncryptException
+	 *             假如秘钥获取失败，则抛出该异常
 	 */
-	public SecretKey getKey() throws EncryptException{
+	public SecretKey getKey() throws EncryptException {
 		if (key == null) {
 			init();
 		}
 		return key;
 	}
-	
+
 	/**
 	 * 获取秘钥字节数组
 	 * 
 	 * @return
-	 * @throws EncryptException 假如秘钥获取失败，则抛出该异常
+	 * @throws EncryptException
+	 *             假如秘钥获取失败，则抛出该异常
 	 */
-	public byte[] getByteArrayKey() throws EncryptException{
+	public byte[] getByteArrayKey() throws EncryptException {
 		return getKey().getEncoded();
 	}
-	
-	public static void main(String[] args) {
-		try {
-			SymmetricEncryption sn = new SymmetricEncryption(EncryptType.RIJNDAEL_256);
-			sn.setKey("811");
-			String s = sn.encrytor("哈哈123");
-			System.out.println(s);
-			System.out.println(s.length());
-			System.out.println(sn.decryptor(s));
-			System.out.println(sn.encryptType);
-		} catch (EncryptException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
+	/**
+	 * 获取秘钥字符串，通过base64转码后的字符串
+	 * 
+	 * @return
+	 * @throws EncryptException
+	 *             假如秘钥获取失败，则抛出该异常
+	 */
+	public String getBase64Key() throws EncryptException {
+		return Base64.getEncoder().encodeToString(getByteArrayKey());
+	}
+
+	/**
+	 * 把秘钥写入输出流中
+	 * 
+	 * @param outputStream
+	 * @throws EncryptException
+	 *             假如秘钥获写入输出流中失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 */
+	public void keyToOutputStream(OutputStream outputStream) throws EncryptException {
+		AssertUtils.isNotNull(outputStream, "outputStream param is null!");
+		try {
+			outputStream.write(getByteArrayKey());
+		} catch (IOException e) {
+			throw new EncryptException(e);
+		}
+	}
+
+	/**
+	 * 把秘钥写入指定的文件中
+	 * 
+	 * @param file
+	 * @throws EncryptException
+	 *             假如秘钥获写入指定的文件中失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 * @throws IllegalArgumentException
+	 *             假如给定的文件是目录，则抛出该异常
+	 */
+	public void keyToFile(File file) throws EncryptException {
+		AssertUtils.isNotNull(file, "file param is null!");
+		mkdirsAndCheckFile(file);
+		FileOutputStream outputStream = null;
+		try {
+			outputStream = new FileOutputStream(file);
+			outputStream.write(getByteArrayKey());
+		} catch (IOException e) {
+			throw new EncryptException("秘钥获写入指定的文件中失败", e);
+		} finally {
+			XLPIOUtil.closeOutputStream(outputStream);
+		}
+	}
+
+	/**
+	 * 假如给定文件的父目录不存在，则创建目录，假如给定的文件是目录则抛出IllegalArgumentException异常
+	 * 
+	 * @param file
+	 * @throws IllegalArgumentException 假如给定的文件是目录,则抛出该异常
+	 */
+	private void mkdirsAndCheckFile(File file) {
+		if (!file.exists()) {
+			file.getParentFile().mkdirs();
+		}
+		if (file.isDirectory()) {
+			throw new IllegalArgumentException("给定的文件是目录，秘钥写入失败！");
+		}
+	}
+
+	/**
+	 * 解密文件
+	 * 
+	 * @param srcFile
+	 *            要解密的文件
+	 * @param destFile
+	 *            解密后目标文件
+	 * @throws EncryptException
+	 *             假如文件解密失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 * @throws IllegalArgumentException
+	 *             假如给定的解密后，存放目标文件是目录，则抛出该异常
+	 * @throws IllegalObjectException
+	 *             假如给定的解密文件是目录或不存在，则抛出该异常
+	 */
+	public void decryptFile(File srcFile, File destFile) throws EncryptException {
+		AssertUtils.assertFile(srcFile);
+		AssertUtils.isNotNull(destFile, "解密后目标存储文件路径为null！");
+		mkdirsAndCheckFile(destFile); 
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = new FileInputStream(srcFile);
+	        out = new FileOutputStream(destFile);
+	        decryptInputStream(in, out);  
+		} catch (IOException e) {
+			throw new EncryptException("解密失败", e);
+		}finally {
+			XLPIOUtil.closeInputStream(in);
+			XLPIOUtil.closeOutputStream(out);
+		}
+	}
+
+	/**
+	 * 解密文件流
+	 * 
+	 * @param srcIn 要解密的输入流
+	 * @param destOut 解密后数据输出流
+	 * @throws EncryptException
+	 *             假如解密失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 */
+	public void decryptInputStream(InputStream srcIn, OutputStream destOut) throws EncryptException {
+		AssertUtils.isNotNull(srcIn, "srcIn param is null！");
+		AssertUtils.isNotNull(destOut, "destOut param is null！");
+		if (key == null) { 
+			init();
+		}
+		CipherOutputStream cos = null;
+		try {
+			// 生成Cipher对象,指定其支持的DES算法
+			Cipher c = Cipher.getInstance(encryptType.getEncryptName());
+			// 根据密钥，对Cipher对象进行初始化，DECRYPT_MODE表示加密模式
+			c.init(Cipher.DECRYPT_MODE, key);
+	        cos = new CipherOutputStream(destOut, c);
+	        XLPIOUtil.copy(srcIn, cos);
+		} catch (Exception e) {
+			throw new EncryptException("解密失败", e);
+		}finally {
+			XLPIOUtil.closeOutputStream(cos);
+		}
+	}
+	
+	/**
+     * 加密文件
+     *
+     * @param srcFile
+     *            要加密的文件
+     * @param destFile
+     *            加密后存放的文件
+     * @throws EncryptException
+	 *             假如文件加密失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 * @throws IllegalArgumentException
+	 *             假如给定的加密后，存放目标文件是目录，则抛出该异常
+	 * @throws IllegalObjectException
+	 *             假如给定的加密文件是目录或不存在，则抛出该异常
+     */
+
+    public void encryptFile(File srcFile, File destFile) throws EncryptException {
+    	AssertUtils.assertFile(srcFile);
+		AssertUtils.isNotNull(destFile, "加密后目标存储文件路径为null！");
+		mkdirsAndCheckFile(destFile); 
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = new FileInputStream(srcFile);
+	        out = new FileOutputStream(destFile);
+	        encryptInputStream(in, out);  
+		} catch (IOException e) {
+			throw new EncryptException("加密失败", e);
+		}finally {
+			XLPIOUtil.closeInputStream(in);
+			XLPIOUtil.closeOutputStream(out);
+		}
+    }
+    
+    /**
+	 * 加密文件流
+	 * 
+	 * @param srcIn 要解密的输入流
+	 * @param destOut 解密后数据输出流
+	 * @throws EncryptException
+	 *             假如加密失败，则抛出该异常
+	 * @throws NullPointerException
+	 *             假如参数为null，则抛出该异常
+	 */
+	public void encryptInputStream(InputStream srcIn, OutputStream destOut) throws EncryptException {
+		AssertUtils.isNotNull(srcIn, "srcIn param is null！");
+		AssertUtils.isNotNull(destOut, "destOut param is null！");
+		if (key == null) { 
+			init();
+		}
+		CipherInputStream cin = null;
+		try {
+			// 生成Cipher对象,指定其支持的DES算法
+			Cipher c = Cipher.getInstance(encryptType.getEncryptName());
+			// 根据密钥，对Cipher对象进行初始化，DECRYPT_MODE表示加密模式
+			c.init(Cipher.ENCRYPT_MODE, key);
+	        cin = new CipherInputStream(srcIn, c);
+	        XLPIOUtil.copy(cin, destOut);
+		} catch (Exception e) {
+			throw new EncryptException("解密失败", e);
+		}finally {
+			XLPIOUtil.closeInputStream(cin);
+		}
 	}
 }
