@@ -470,7 +470,7 @@ public class SymmetricEncryption {
 	 * 
 	 * @param outputStream
 	 * @throws EncryptException
-	 *             假如秘钥获写入输出流中失败，则抛出该异常
+	 *             假如秘钥写入输出流中失败，则抛出该异常
 	 * @throws NullPointerException
 	 *             假如参数为null，则抛出该异常
 	 */
@@ -488,7 +488,7 @@ public class SymmetricEncryption {
 	 * 
 	 * @param file
 	 * @throws EncryptException
-	 *             假如秘钥获写入指定的文件中失败，则抛出该异常
+	 *             假如秘钥写入指定的文件中失败，则抛出该异常
 	 * @throws NullPointerException
 	 *             假如参数为null，则抛出该异常
 	 * @throws IllegalArgumentException
@@ -502,7 +502,7 @@ public class SymmetricEncryption {
 			outputStream = new FileOutputStream(file);
 			outputStream.write(getByteArrayKey());
 		} catch (IOException e) {
-			throw new EncryptException("秘钥获写入指定的文件中失败", e);
+			throw new EncryptException("秘钥写入指定的文件中失败", e);
 		} finally {
 			XLPIOUtil.closeOutputStream(outputStream);
 		}
@@ -512,7 +512,8 @@ public class SymmetricEncryption {
 	 * 假如给定文件的父目录不存在，则创建目录，假如给定的文件是目录则抛出IllegalArgumentException异常
 	 * 
 	 * @param file
-	 * @throws IllegalArgumentException 假如给定的文件是目录,则抛出该异常
+	 * @throws IllegalArgumentException
+	 *             假如给定的文件是目录,则抛出该异常
 	 */
 	private void mkdirsAndCheckFile(File file) {
 		if (!file.exists()) {
@@ -542,16 +543,16 @@ public class SymmetricEncryption {
 	public void decryptFile(File srcFile, File destFile) throws EncryptException {
 		AssertUtils.assertFile(srcFile);
 		AssertUtils.isNotNull(destFile, "解密后目标存储文件路径为null！");
-		mkdirsAndCheckFile(destFile); 
+		mkdirsAndCheckFile(destFile);
 		InputStream in = null;
 		OutputStream out = null;
 		try {
 			in = new FileInputStream(srcFile);
-	        out = new FileOutputStream(destFile);
-	        decryptInputStream(in, out);  
+			out = new FileOutputStream(destFile);
+			decryptInputStream(in, out);
 		} catch (IOException e) {
 			throw new EncryptException("解密失败", e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeInputStream(in);
 			XLPIOUtil.closeOutputStream(out);
 		}
@@ -560,8 +561,10 @@ public class SymmetricEncryption {
 	/**
 	 * 解密文件流
 	 * 
-	 * @param srcIn 要解密的输入流
-	 * @param destOut 解密后数据输出流
+	 * @param srcIn
+	 *            要解密的输入流
+	 * @param destOut
+	 *            解密后数据输出流
 	 * @throws EncryptException
 	 *             假如解密失败，则抛出该异常
 	 * @throws NullPointerException
@@ -570,7 +573,7 @@ public class SymmetricEncryption {
 	public void decryptInputStream(InputStream srcIn, OutputStream destOut) throws EncryptException {
 		AssertUtils.isNotNull(srcIn, "srcIn param is null！");
 		AssertUtils.isNotNull(destOut, "destOut param is null！");
-		if (key == null) { 
+		if (key == null) {
 			init();
 		}
 		CipherOutputStream cos = null;
@@ -579,23 +582,23 @@ public class SymmetricEncryption {
 			Cipher c = Cipher.getInstance(encryptType.getEncryptName());
 			// 根据密钥，对Cipher对象进行初始化，DECRYPT_MODE表示加密模式
 			c.init(Cipher.DECRYPT_MODE, key);
-	        cos = new CipherOutputStream(destOut, c);
-	        XLPIOUtil.copy(srcIn, cos);
+			cos = new CipherOutputStream(destOut, c);
+			XLPIOUtil.copy(srcIn, cos);
 		} catch (Exception e) {
 			throw new EncryptException("解密失败", e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeOutputStream(cos);
 		}
 	}
-	
+
 	/**
-     * 加密文件
-     *
-     * @param srcFile
-     *            要加密的文件
-     * @param destFile
-     *            加密后存放的文件
-     * @throws EncryptException
+	 * 加密文件
+	 *
+	 * @param srcFile
+	 *            要加密的文件
+	 * @param destFile
+	 *            加密后存放的文件
+	 * @throws EncryptException
 	 *             假如文件加密失败，则抛出该异常
 	 * @throws NullPointerException
 	 *             假如参数为null，则抛出该异常
@@ -603,31 +606,32 @@ public class SymmetricEncryption {
 	 *             假如给定的加密后，存放目标文件是目录，则抛出该异常
 	 * @throws IllegalObjectException
 	 *             假如给定的加密文件是目录或不存在，则抛出该异常
-     */
-
-    public void encryptFile(File srcFile, File destFile) throws EncryptException {
-    	AssertUtils.assertFile(srcFile);
+	 */
+	public void encryptFile(File srcFile, File destFile) throws EncryptException {
+		AssertUtils.assertFile(srcFile);
 		AssertUtils.isNotNull(destFile, "加密后目标存储文件路径为null！");
-		mkdirsAndCheckFile(destFile); 
+		mkdirsAndCheckFile(destFile);
 		InputStream in = null;
 		OutputStream out = null;
 		try {
 			in = new FileInputStream(srcFile);
-	        out = new FileOutputStream(destFile);
-	        encryptInputStream(in, out);  
+			out = new FileOutputStream(destFile);
+			encryptInputStream(in, out);
 		} catch (IOException e) {
 			throw new EncryptException("加密失败", e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeInputStream(in);
 			XLPIOUtil.closeOutputStream(out);
 		}
-    }
-    
-    /**
+	}
+
+	/**
 	 * 加密文件流
 	 * 
-	 * @param srcIn 要解密的输入流
-	 * @param destOut 解密后数据输出流
+	 * @param srcIn
+	 *            要解密的输入流
+	 * @param destOut
+	 *            解密后数据输出流
 	 * @throws EncryptException
 	 *             假如加密失败，则抛出该异常
 	 * @throws NullPointerException
@@ -636,7 +640,7 @@ public class SymmetricEncryption {
 	public void encryptInputStream(InputStream srcIn, OutputStream destOut) throws EncryptException {
 		AssertUtils.isNotNull(srcIn, "srcIn param is null！");
 		AssertUtils.isNotNull(destOut, "destOut param is null！");
-		if (key == null) { 
+		if (key == null) {
 			init();
 		}
 		CipherInputStream cin = null;
@@ -645,11 +649,11 @@ public class SymmetricEncryption {
 			Cipher c = Cipher.getInstance(encryptType.getEncryptName());
 			// 根据密钥，对Cipher对象进行初始化，DECRYPT_MODE表示加密模式
 			c.init(Cipher.ENCRYPT_MODE, key);
-	        cin = new CipherInputStream(srcIn, c);
-	        XLPIOUtil.copy(cin, destOut);
+			cin = new CipherInputStream(srcIn, c);
+			XLPIOUtil.copy(cin, destOut);
 		} catch (Exception e) {
 			throw new EncryptException("解密失败", e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeInputStream(cin);
 		}
 	}
