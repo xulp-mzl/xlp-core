@@ -141,7 +141,9 @@ public abstract class Json{
 		}else if (value instanceof Collection) {
 			jsonSB.append(JsonArray.fromCollection((Collection<?>) value, 
 					jsonConfig).format(spaceCount + SPACE_COUNT, isAddSpace));
-		}else {
+		}else if (cs == Boolean.TYPE || cs == Boolean.class) {
+			jsonSB.append(Boolean.TRUE.equals(value)); 
+		} else {
 			value = value.toString();
 			value = jsonConfig.getSpecialCharacterConfig().toString((String) value);
 			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(value)
