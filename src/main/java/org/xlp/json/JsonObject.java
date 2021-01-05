@@ -809,6 +809,7 @@ public final class JsonObject extends Json{
 		FieldName fn = null;
 		String fnAlias = null; //获取字段别名
 		for (PropertyDescriptor<T> pd : pds) {
+			fnAlias = null;
 			if (isUsedAnnotation) {
 				fn = pd.getFieldAnnotation(FieldName.class);
 				if (fn != null) {
