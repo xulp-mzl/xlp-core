@@ -823,7 +823,7 @@ public final class JsonObject extends Json{
 						BeanUtil.callGetter(bean, pd), 
 						pd.getFiledClassType().getAnnotation(Bean.class) != null, 
 						isUsedAnnotation, jsonConfig);
-				jsonObject.putElements(fnAlias, jsonElement);
+				jsonObject.putElement(fnAlias, jsonElement);
 			}
 		}
 		return jsonObject;
