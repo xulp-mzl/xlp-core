@@ -28,14 +28,24 @@ public class XLPFilePathUtil {
 	public static final String SLASH_STR = "/";
 	
 	/**
-	 * 字符常量：反斜杠 {@code '\\'}
+	 * 字符串常量：斜杠 {@code "//"}
+	 */
+	public static final String DOUBLE_SLASH_STR = "//";
+	
+	/**
+	 * 字符常量：反斜杠 {@code '\'}
 	 */
 	public static final char BACKSLASH = '\\';
 	
 	/**
-	 * 字符串常量：反斜杠 {@code "\\"}
+	 * 字符串常量：反斜杠 {@code "\"}
 	 */
 	public static final String BACKSLASH_STR = "\\";
+	
+	/**
+	 * 字符串常量：反斜杠 {@code "\\"}
+	 */
+	public static final String DOUBLE_BACKSLASH_STR = "\\\\";
 
 	/**
 	 * 修复路径<br>
@@ -75,7 +85,10 @@ public class XLPFilePathUtil {
 		}
 		String osFileSplit = XLPSystemParamUtil.getFileSeparator();
 		String normaPath = XLPCollectionUtil.toString(normaPaths, osFileSplit);
-		if (path.startsWith(SLASH_STR) && !normaPath.startsWith(osFileSplit)) { 
+		//兼容Windows下的共享目录路径（原始路径如果以\\开头，则保留这种路径）
+		if (path.startsWith(DOUBLE_SLASH_STR) && !normaPath.startsWith(osFileSplit)) { 
+			normaPath = osFileSplit + osFileSplit + normaPath;
+		} else if (path.startsWith(SLASH_STR) && !normaPath.startsWith(osFileSplit)) { 
 			normaPath = osFileSplit + normaPath;
 		}
 		if (path.endsWith(SLASH_STR) && !normaPath.endsWith(osFileSplit)) { 

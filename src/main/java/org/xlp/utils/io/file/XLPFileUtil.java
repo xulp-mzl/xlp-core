@@ -1,8 +1,12 @@
 package org.xlp.utils.io.file;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.xlp.assertion.AssertUtils;
+import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.io.path.XLPFilePathUtil;
 
 /**
@@ -162,5 +166,70 @@ public class XLPFileUtil {
 		return deleteFile(filePath, true);
 	}
 	
+	/**
+	 * 获取给定文件目录下的所有文件
+	 * 
+	 * @param file
+	 * @param filter 文件过滤器
+	 * @return 假如给定的文件目录不存在或为null，返回List(0), 假如是文件返回该文件，假如是目录，递归查询所有文件
+	 */
+	public static List<File> listFiles(File file, FileFilter filter){
+		List<File> files = new LinkedList<File>();
+		if (file == null || !file.exists()) {
+			return files;
+		}
+		
+		if (file.isFile()) {
+			if (filter == null || filter.accept(file)) {
+				files.add(file);
+			}
+		} else {
+			File[] childFiles;
+			if (filter == null) {
+				childFiles = file.listFiles();
+			}else {
+				childFiles = file.listFiles(filter);
+			}
+			if (childFiles != null) { 
+				for (File childFile : childFiles) { 
+					files.addAll(listFiles(childFile, filter));
+				}
+			}
+		}
+		return files;
+	}
 	
+	/**
+	 * 获取给定文件目录下的所有文件
+	 * 
+	 * @param file
+	 * @return 假如给定的文件目录不存在或为null，返回List(0), 假如是文件返回该文件，假如是目录，递归查询所有文件
+	 */
+	public static List<File> listFiles(File file){
+		return listFiles(file, null);
+	}
+	
+	/**
+	 * 获取给定文件目录下的所有文件
+	 * 
+	 * @param filePath
+	 * @param filter 文件过滤器
+	 * @return 假如给定的文件目录不存在或为null，返回List(0), 假如是文件返回该文件，假如是目录，递归查询所有文件
+	 */
+	public static List<File> listFiles(String filePath, FileFilter filter){
+		if (XLPStringUtil.isEmpty(filePath)) { 
+			return new LinkedList<File>();
+		}
+		return listFiles(new File(filePath.trim()), filter);
+	}
+	
+	/**
+	 * 获取给定文件目录下的所有文件
+	 * 
+	 * @param filePath
+	 * @return 假如给定的文件目录不存在或为null，返回List(0), 假如是文件返回该文件，假如是目录，递归查询所有文件
+	 */
+	public static List<File> listFiles(String filePath){
+		return listFiles(filePath, null);
+	}
 }
