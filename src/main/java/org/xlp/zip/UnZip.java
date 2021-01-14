@@ -11,6 +11,7 @@ import java.util.zip.ZipInputStream;
 
 import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.io.XLPIOUtil;
+import org.xlp.utils.io.path.XLPFilePathUtil;
 
 /**
  * zip文件解压类，提供zip文件解压方法
@@ -183,6 +184,7 @@ public class UnZip {
 			// 不为空进入循环
 			while (entry != null) {
 				String name = entry.getName();
+				name = XLPFilePathUtil.normalize(name);
 				// 如果是文件夹，就创建个文件夹 
 				if (entry.isDirectory()) {
 					File file = new File(destDir, name);

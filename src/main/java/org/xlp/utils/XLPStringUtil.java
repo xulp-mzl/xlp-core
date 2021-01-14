@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xlp.array.XLPArrayParseString;
+
 /**
  * @version 2.2
  * @author 徐龙平
@@ -31,8 +33,7 @@ public class XLPStringUtil {
 	 * @return
 	 */
 	public static String uuidU() {
-		return UUID.randomUUID().toString().replace("-", "")
-				.toUpperCase(Locale.US);
+		return UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.US);
 	}
 
 	/**
@@ -41,8 +42,7 @@ public class XLPStringUtil {
 	 * @return
 	 */
 	public static String uuidL() {
-		return UUID.randomUUID().toString().replace("-", "")
-				.toLowerCase(Locale.US);
+		return UUID.randomUUID().toString().replace("-", "").toLowerCase(Locale.US);
 	}
 
 	/**
@@ -60,8 +60,7 @@ public class XLPStringUtil {
 	 */
 	public static int getCharacterPosition(String string, String s, int num) {
 		int len1, len2;
-		if (string == null || s == null
-				|| (len2 = s.length()) > (len1 = string.length())) {
+		if (string == null || s == null || (len2 = s.length()) > (len1 = string.length())) {
 			return INDEX_NOT_FOUND;
 		}
 
@@ -164,9 +163,9 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         isEmpty(null) 返回true
 	 *         <p>
-	 *         isEmpty("  \n") 返回true
+	 *         isEmpty(" \n") 返回true
 	 *         <p>
-	 *         isEmpty(" 2  \n") 返回false
+	 *         isEmpty(" 2 \n") 返回false
 	 */
 	public static boolean isEmpty(String s) {
 		if (s == null || s.trim().isEmpty()) {
@@ -187,9 +186,9 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         isNullOrEmpty(null) 返回true
 	 *         <p>
-	 *         isNullOrEmpty("  \n") 返回false
+	 *         isNullOrEmpty(" \n") 返回false
 	 *         <p>
-	 *         isNullOrEmpty(" 2  \n") 返回false
+	 *         isNullOrEmpty(" 2 \n") 返回false
 	 */
 	public static boolean isNullOrEmpty(String s) {
 		if (s == null || s.isEmpty()) {
@@ -210,7 +209,7 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         isBlankSpace("") 返回true
 	 *         <p>
-	 *         isBlankSpace("   ") 返回true
+	 *         isBlankSpace(" ") 返回true
 	 *         <p>
 	 *         isBlankSpace(" 13") 返回false
 	 */
@@ -233,11 +232,11 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         toEmpty(null) 返回""
 	 *         <p>
-	 *         toEmpty("   ") 返回""
+	 *         toEmpty(" ") 返回""
 	 *         <p>
-	 *         toEmpty("   \n\t") 返回""
+	 *         toEmpty(" \n\t") 返回""
 	 *         <p>
-	 *         toEmpty(" 33  \n\t") 返回" 33  \n\t"
+	 *         toEmpty(" 33 \n\t") 返回" 33 \n\t"
 	 */
 	public static String toEmpty(String s) {
 		return isEmpty(s) ? EMPTY : s;
@@ -255,11 +254,11 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         nullToEmpty(null) 返回""
 	 *         <p>
-	 *         nullToEmpty("   ") 返回"   "
+	 *         nullToEmpty(" ") 返回" "
 	 *         <p>
-	 *         nullToEmpty("   \n\t") 返回"   \n\t"
+	 *         nullToEmpty(" \n\t") 返回" \n\t"
 	 *         <p>
-	 *         nullToEmpty(" 33  \n\t") 返回" 33  \n\t"
+	 *         nullToEmpty(" 33 \n\t") 返回" 33 \n\t"
 	 */
 	public static String nullToEmpty(String s) {
 		return isNullOrEmpty(s) ? EMPTY : s;
@@ -277,11 +276,11 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         toBlankSpace(null) 返回null
 	 *         <p>
-	 *         toBlankSpace("   ") 返回""
+	 *         toBlankSpace(" ") 返回""
 	 *         <p>
-	 *         toBlankSpace("   \n\t") 返回""
+	 *         toBlankSpace(" \n\t") 返回""
 	 *         <p>
-	 *         toBlankSpace(" 33  \n\t") 返回" 33  \n\t"
+	 *         toBlankSpace(" 33 \n\t") 返回" 33 \n\t"
 	 */
 	public static String toBlankSpace(String s) {
 		return isBlankSpace(s) ? EMPTY : s;
@@ -299,11 +298,11 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         toNull(null) 返回null
 	 *         <p>
-	 *         toNull("   ") 返回null
+	 *         toNull(" ") 返回null
 	 *         <p>
-	 *         toNull("   \n\t") 返回null
+	 *         toNull(" \n\t") 返回null
 	 *         <p>
-	 *         toNull(" 33  \n\t") 返回" 33  \n\t"
+	 *         toNull(" 33 \n\t") 返回" 33 \n\t"
 	 */
 	public static String toNull(String s) {
 		return isEmpty(s) ? NONE : s;
@@ -321,9 +320,9 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         emptyToNull(null) 返回null
 	 *         <p>
-	 *         emptyToNull("   ") 返回"   "
+	 *         emptyToNull(" ") 返回" "
 	 *         <p>
-	 *         emptyToNull(" 33  \n\t") 返回" 33  \n\t"
+	 *         emptyToNull(" 33 \n\t") 返回" 33 \n\t"
 	 */
 	public static String emptyToNull(String s) {
 		return isNullOrEmpty(s) ? NONE : s;
@@ -560,12 +559,12 @@ public class XLPStringUtil {
 	 * @return 假如是返回true，假如参数为空或不是返回false
 	 */
 	public static boolean startsWith(String s, String regex) {
-		if(s == null || regex == null)
+		if (s == null || regex == null)
 			return false;
 		int index = indexOf(s, regex);
-		return index != 0 ? false : true; 
+		return index != 0 ? false : true;
 	}
-	
+
 	/**
 	 * 判断给定的字符串是否以给定的格式结尾
 	 * 
@@ -576,17 +575,17 @@ public class XLPStringUtil {
 	 * @return 假如是返回true，假如参数为空或不是返回false
 	 */
 	public static boolean endsWith(String s, String regex) {
-		if(s == null || regex == null)
+		if (s == null || regex == null)
 			return false;
 		String[] matcheStr = findSubStrings(s, regex);
-		for (String string : matcheStr) { 
-			if (s.endsWith(string)) { 
+		for (String string : matcheStr) {
+			if (s.endsWith(string)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 获取子字符串在给定的字符串第一次出现的位置
 	 * 
@@ -596,7 +595,7 @@ public class XLPStringUtil {
 	 *            正则表达式
 	 * @return 假如找到返回第一次出现的位置，否则返回-1
 	 */
-	public static int indexOf(String s, String regex){
+	public static int indexOf(String s, String regex) {
 		if (s == null || regex == null)
 			return INDEX_NOT_FOUND;
 		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
@@ -606,7 +605,7 @@ public class XLPStringUtil {
 		}
 		return INDEX_NOT_FOUND;
 	}
-	
+
 	/**
 	 * 获取子字符串在给定的字符串最后一次出现的位置
 	 * 
@@ -616,7 +615,7 @@ public class XLPStringUtil {
 	 *            正则表达式
 	 * @return 假如找到返回最后一次出现的位置，否则返回-1
 	 */
-	public static int lastIndexOf(String s, String regex){
+	public static int lastIndexOf(String s, String regex) {
 		if (s == null || regex == null)
 			return INDEX_NOT_FOUND;
 		Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
@@ -626,7 +625,7 @@ public class XLPStringUtil {
 			start = matcher.start();
 		return start;
 	}
-	
+
 	/**
 	 * 
 	 * 把为null的字符串或""处理成""
@@ -640,16 +639,16 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         nullToEmpty(null) 返回""
 	 *         <p>
-	 *         nullToEmpty("   ") 返回""
+	 *         nullToEmpty(" ") 返回""
 	 *         <p>
-	 *         nullToEmpty("   \n\t") 返回""
+	 *         nullToEmpty(" \n\t") 返回""
 	 *         <p>
-	 *         nullToEmpty(" 33  \n\t") 返回"33"
+	 *         nullToEmpty(" 33 \n\t") 返回"33"
 	 */
-	public static String emptyTrim(String s){
+	public static String emptyTrim(String s) {
 		return isEmpty(s) ? "" : s.trim();
 	}
-	
+
 	/**
 	 * 把为""或全为空白字符的字符串处理成""
 	 * 
@@ -662,13 +661,226 @@ public class XLPStringUtil {
 	 *         <p>
 	 *         blankSpaceToNull(null) 返回null
 	 *         <p>
-	 *         blankSpaceToNull("   ") 返回null
+	 *         blankSpaceToNull(" ") 返回null
 	 *         <p>
-	 *         blankSpaceToNull("   \n\t") 返回null
+	 *         blankSpaceToNull(" \n\t") 返回null
 	 *         <p>
-	 *         blankSpaceToNull(" 33  \n\t") 返回"33"
+	 *         blankSpaceToNull(" 33 \n\t") 返回"33"
 	 */
 	public static String blankSpaceToNull(String s) {
 		return isEmpty(s) ? NONE : s.trim();
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param isTrim
+	 *            是否去除切分字符串后每个元素两边的空格
+	 * @param ignoreEmpty
+	 *            是否忽略空串
+	 * @param limit
+	 *            切分成数组的长度
+	 * @see {@link String#split()}
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, String regex, boolean isTrim, boolean ignoreEmpty, int limit) {
+		if (str == null) {
+			return new String[0];
+		}
+		String[] splits = str.toString().split(regex, limit);
+		List<String> result = new ArrayList<String>(splits.length);
+		for (String str1 : splits) {
+			if (str1 != null && isTrim) {
+				str1 = str1.trim();
+			}
+			if (ignoreEmpty && XLPStringUtil.isEmpty(str1)) {
+				continue;
+			}
+			result.add(str1);
+		}
+		return result.toArray(new String[0]);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param isTrim
+	 *            是否去除切分字符串后每个元素两边的空格
+	 * @param limit
+	 *            切分成数组的长度
+	 * @see {@link String#split()}
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, String regex, boolean isTrim, int limit) {
+		return split(str, regex, isTrim, true, limit);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param isTrim
+	 *            是否去除切分字符串后每个元素两边的空格
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, String regex, boolean isTrim) {
+		return split(str, regex, isTrim, 0);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param ignoreEmpty
+	 *            是否忽略空串
+	 * @param limit
+	 *            切分成数组的长度
+	 * @see {@link String#split()}
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, boolean ignoreEmpty, String regex, int limit) {
+		return split(str, regex, true, ignoreEmpty, limit);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param ignoreEmpty
+	 *            是否忽略空串
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, boolean ignoreEmpty, String regex) {
+		return split(str, ignoreEmpty, regex, 0);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @param limit
+	 *            切分成数组的长度
+	 * @see {@link String#split()}
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, String regex, int limit) {
+		return split(str, regex, true, true, limit);
+	}
+
+	/**
+	 * 切分字符串，不限制分片数量,参考hutool
+	 *
+	 * @param str
+	 *            被切分的字符串
+	 * @param regex
+	 *            分隔符正则
+	 * @return 切分后的集合, 假如要切分的字符串为null，返回String[0]
+	 */
+	public static String[] split(CharSequence str, String regex) {
+		return split(str, regex, 0);
+	}
+
+	/**
+	 * 把字符串数组拼接成字符串
+	 * 
+	 * @param strs
+	 *            字符串数组
+	 * @param prefix
+	 *            前缀(假如为null->"[")
+	 * @param suffix
+	 *            后缀(假如为null->"]")
+	 * @param split
+	 *            拼接分隔字符串(假如为null->", ")
+	 * @param isTrim
+	 *            是否去掉字符串数组每个元素两边的空格
+	 * @param ignoreEmpty
+	 *            是否忽略字符串数组中的空元素
+	 * @return 拼接后的字符串，假如字符串数组为null，返回""
+	 */
+	public static String join(String[] strs, String prefix, String suffix, String split, boolean isTrim,
+			boolean ignoreEmpty) {
+		if (XLPArrayUtil.isEmpty(strs)) {
+			return EMPTY;
+		}
+		List<String> result = new ArrayList<String>(strs.length);
+		for (String str : strs) {
+			if (str != null && isTrim) {
+				str = str.trim();
+			}
+			if (ignoreEmpty && XLPStringUtil.isEmpty(str)) {
+				continue;
+			}
+			result.add(str);
+		}
+
+		XLPArrayParseString arrayParseString = new XLPArrayParseString(prefix, suffix, split);
+		return arrayParseString.toString(result.toArray());
+	}
+
+	/**
+	 * 把字符串数组拼接成字符串
+	 * 
+	 * @param strs
+	 *            字符串数组
+	 * @param prefix
+	 *            前缀(假如为null->"[")
+	 * @param suffix
+	 *            后缀(假如为null->"]")
+	 * @param split
+	 *            拼接分隔字符串(假如为null->", ")
+	 * @return 拼接后的字符串，假如字符串数组为null，返回""
+	 */
+	public static String join(String[] strs, String prefix, String suffix, String split) {
+		return join(strs, prefix, suffix, split, false, false);
+	}
+
+	/**
+	 * 把字符串数组拼接成字符串
+	 * 
+	 * @param strs
+	 *            字符串数组
+	 * @param split
+	 *            拼接分隔字符串(假如为null->", ")
+	 * @param isTrim
+	 *            是否去掉字符串数组每个元素两边的空格
+	 * @param ignoreEmpty
+	 *            是否忽略字符串数组中的空元素
+	 * @return 拼接后的字符串，假如字符串数组为null，返回""
+	 */
+	public static String join(String[] strs, String split, boolean isTrim, boolean ignoreEmpty) {
+		return join(strs, EMPTY, EMPTY, split, isTrim, ignoreEmpty);
+	}
+
+	/**
+	 * 把字符串数组拼接成字符串
+	 * 
+	 * @param strs
+	 *            字符串数组
+	 * @param split
+	 *            拼接分隔字符串(假如为null->", ")
+	 * @return 拼接后的字符串，假如字符串数组为null，返回""
+	 */
+	public static String join(String[] strs, String split) {
+		return join(strs, EMPTY, EMPTY, split);
 	}
 }

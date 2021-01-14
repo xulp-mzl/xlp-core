@@ -47,7 +47,7 @@ public class XLPArrayParseString {
 	 * @param split
 	 */
 	private void initSplit(String split) {
-		if (split != null && split.length() > 0) {
+		if (split != null) {
 			this.split = split;
 		}
 	}
