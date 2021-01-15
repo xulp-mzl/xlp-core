@@ -224,7 +224,7 @@ public class XLPFileUtil {
 	}
 	
 	/**
-	 * 获取给定文件目录下的所有文件  
+	 * 获取给定文件目录下的所有文件
 	 * 
 	 * @param filePath
 	 * @return 假如给定的文件目录不存在或为null，返回List(0), 假如是文件返回该文件，假如是目录，递归查询所有文件
