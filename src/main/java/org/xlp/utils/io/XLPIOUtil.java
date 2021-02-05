@@ -1,5 +1,7 @@
 package org.xlp.utils.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -113,13 +115,11 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static byte[] IOToByteArray(InputStream in, boolean closeStream)
-			throws IOException {
+	public static byte[] IOToByteArray(InputStream in, boolean closeStream) throws IOException {
 		if (in == null) {
 			return null;
 		}
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(
-				DEFAULT_BUFFER_SIZE);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 		copy(in, bos, closeStream);
 
 		return bos.toByteArray();
@@ -135,8 +135,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常 假如in或out为空，则抛出空指针异常
 	 */
-	public static long copy(InputStream in, OutputStream out)
-			throws IOException {
+	public static long copy(InputStream in, OutputStream out) throws IOException {
 		return copy(in, out, false);
 	}
 
@@ -151,8 +150,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常 假如in或out为空，则抛出空指针异常
 	 */
-	public static long copy(InputStream in, OutputStream out,
-			boolean closeTheseStream) throws IOException {
+	public static long copy(InputStream in, OutputStream out, boolean closeTheseStream) throws IOException {
 		if (in == null) {
 			throw new NullPointerException("copy()函数中参数【InputStream:in】为空");
 		}
@@ -191,8 +189,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static long copy(Reader reader, Writer writer,
-			boolean closeTheseStream) throws IOException {
+	public static long copy(Reader reader, Writer writer, boolean closeTheseStream) throws IOException {
 		if (reader == null) {
 			throw new NullPointerException("copy()函数中参数【Reader:reader】为空");
 		}
@@ -230,8 +227,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(Reader reader, OutputStream out,
-			boolean closeTheseStream) throws IOException {
+	public static void copy(Reader reader, OutputStream out, boolean closeTheseStream) throws IOException {
 		copy(reader, out, closeTheseStream, DEFAULT_ENCODIND);
 	}
 
@@ -260,13 +256,12 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(Reader reader, OutputStream out,
-			boolean closeTheseStream, String encoding) throws IOException {
+	public static void copy(Reader reader, OutputStream out, boolean closeTheseStream, String encoding)
+			throws IOException {
 		BufferedWriter bWriter = null;
 
 		if (encoding == null || encoding.trim().length() == 0) {
-			bWriter = new BufferedWriter(new OutputStreamWriter(out,
-					DEFAULT_ENCODIND));
+			bWriter = new BufferedWriter(new OutputStreamWriter(out, DEFAULT_ENCODIND));
 		} else {
 			bWriter = new BufferedWriter(new OutputStreamWriter(out, encoding));
 		}
@@ -285,8 +280,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(Reader reader, OutputStream out, String encoding)
-			throws IOException {
+	public static void copy(Reader reader, OutputStream out, String encoding) throws IOException {
 		copy(reader, out, false, encoding);
 	}
 
@@ -316,12 +310,11 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(InputStream in, Writer writer,
-			boolean closeTheseStream, String encoding) throws IOException {
+	public static void copy(InputStream in, Writer writer, boolean closeTheseStream, String encoding)
+			throws IOException {
 		BufferedReader reader = null;
 		if (XLPStringUtil.isEmpty(encoding)) {
-			reader = new BufferedReader(new InputStreamReader(in),
-					DEFAULT_BUFFER_SIZE);
+			reader = new BufferedReader(new InputStreamReader(in), DEFAULT_BUFFER_SIZE);
 		} else {
 			reader = new BufferedReader(new InputStreamReader(in, encoding));
 		}
@@ -340,8 +333,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(InputStream in, Writer writer,
-			boolean closeTheseStream) throws IOException {
+	public static void copy(InputStream in, Writer writer, boolean closeTheseStream) throws IOException {
 		copy(in, writer, closeTheseStream, DEFAULT_ENCODIND);
 	}
 
@@ -356,8 +348,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO访问出错时，抛出该异常
 	 */
-	public static void copy(InputStream in, Writer writer, String encoding)
-			throws IOException {
+	public static void copy(InputStream in, Writer writer, String encoding) throws IOException {
 		copy(in, writer, false, encoding);
 	}
 
@@ -391,13 +382,11 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static byte[] IOToByteArray(Reader reader, boolean closeStream,
-			String encoding) throws IOException {
+	public static byte[] IOToByteArray(Reader reader, boolean closeStream, String encoding) throws IOException {
 		if (reader == null) {
 			return null;
 		}
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(
-				DEFAULT_BUFFER_SIZE);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 		copy(reader, bos, closeStream, encoding);
 		return bos.toByteArray();
 	}
@@ -418,8 +407,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static byte[] IOToByteArray(Reader reader, boolean closeStream)
-			throws IOException {
+	public static byte[] IOToByteArray(Reader reader, boolean closeStream) throws IOException {
 		return IOToByteArray(reader, closeStream, DEFAULT_ENCODIND);
 	}
 
@@ -439,8 +427,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static byte[] IOToByteArray(Reader reader, String encoding)
-			throws IOException {
+	public static byte[] IOToByteArray(Reader reader, String encoding) throws IOException {
 		return IOToByteArray(reader, true, encoding);
 	}
 
@@ -479,8 +466,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(InputStream in, boolean closeStream,
-			String encoding) throws IOException {
+	public static char[] IOToCharArray(InputStream in, boolean closeStream, String encoding) throws IOException {
 		if (in == null) {
 			return null;
 		}
@@ -506,8 +492,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(InputStream in, boolean closeStream)
-			throws IOException {
+	public static char[] IOToCharArray(InputStream in, boolean closeStream) throws IOException {
 		return IOToCharArray(in, closeStream, DEFAULT_ENCODIND);
 	}
 
@@ -527,8 +512,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(InputStream in, String encoding)
-			throws IOException {
+	public static char[] IOToCharArray(InputStream in, String encoding) throws IOException {
 		return IOToCharArray(in, true, encoding);
 	}
 
@@ -565,8 +549,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(Reader reader, boolean closeStream)
-			throws IOException {
+	public static char[] IOToCharArray(Reader reader, boolean closeStream) throws IOException {
 		if (reader == null) {
 			return null;
 		}
@@ -627,15 +610,13 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(File file, String encoding)
-			throws IOException {
+	public static char[] IOToCharArray(File file, String encoding) throws IOException {
 		if (file == null) {
 			return null;
 		}
-		if(XLPStringUtil.isEmpty(encoding))
+		if (XLPStringUtil.isEmpty(encoding))
 			encoding = DEFAULT_ENCODIND;
-		return IOToCharArray(new BufferedReader(new InputStreamReader(
-				new FileInputStream(file), encoding)));
+		return IOToCharArray(new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding)));
 	}
 
 	/**
@@ -671,8 +652,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static char[] IOToCharArray(String filePath, String encoding)
-			throws IOException {
+	public static char[] IOToCharArray(String filePath, String encoding) throws IOException {
 		if (filePath == null) {
 			return null;
 		}
@@ -696,13 +676,11 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(InputStream in, boolean closeStream,
-			String encoding) throws IOException {
+	public static String toString(InputStream in, boolean closeStream, String encoding) throws IOException {
 		if (in == null) {
 			return null;
 		}
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(
-				DEFAULT_BUFFER_SIZE);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 		copy(in, bos, closeStream);
 		return bos.toString(encoding);
 	}
@@ -723,8 +701,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(InputStream in, boolean closeStream)
-			throws IOException {
+	public static String toString(InputStream in, boolean closeStream) throws IOException {
 		return toString(in, closeStream, DEFAULT_ENCODIND);
 	}
 
@@ -744,8 +721,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(InputStream in, String encoding)
-			throws IOException {
+	public static String toString(InputStream in, String encoding) throws IOException {
 		return toString(in, true, encoding);
 	}
 
@@ -781,8 +757,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(File file, String encoding)
-			throws IOException {
+	public static String toString(File file, String encoding) throws IOException {
 		if (file == null) {
 			return null;
 		}
@@ -803,8 +778,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(String filePath, String encoding)
-			throws IOException {
+	public static String toString(String filePath, String encoding) throws IOException {
 		if (filePath == null) {
 			return null;
 		}
@@ -826,8 +800,7 @@ public class XLPIOUtil {
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 */
-	public static String toString(Reader reader, boolean closeStream)
-			throws IOException {
+	public static String toString(Reader reader, boolean closeStream) throws IOException {
 		if (reader == null) {
 			return null;
 		}
@@ -964,21 +937,21 @@ public class XLPIOUtil {
 		}
 		return closeSucc;
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
+	 * @param out
+	 *            输出流
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(byte[] data, OutputStream out) 
-			throws IOException{
-		if(data != null){
+	public static void write(byte[] data, OutputStream out) throws IOException {
+		if (data != null) {
 			out.write(data);
 			out.flush();
 		}
@@ -989,61 +962,63 @@ public class XLPIOUtil {
 	 *
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
-	 * @param charSet 数据写入时，所用编码格式
+	 * @param out
+	 *            输出流
+	 * @param charSet
+	 *            数据写入时，所用编码格式
 	 * @param close
 	 *            是否关闭传入的流，=true，关闭，否则不关闭
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	private static void write(String data, OutputStream out, 
-			String charSet, boolean close) throws IOException{
-		if(data != null){
+	private static void write(String data, OutputStream out, String charSet, boolean close) throws IOException {
+		if (data != null) {
 			String temp = null;
 			int len = data.length();
 			try {
-				for (int i = 0; i < len ; ) {
-					if(len > 255){
+				for (int i = 0; i < len;) {
+					if (len > 255) {
 						temp = data.substring(0, 255);
 						data = data.substring(255);
 						len = data.length();
-					}else {
+					} else {
 						temp = data;
 						len = len - 255;
 					}
-					
-					if(XLPStringUtil.isEmpty(charSet))
+
+					if (XLPStringUtil.isEmpty(charSet))
 						write(temp.getBytes(), out);
 					else
 						write(temp.getBytes(charSet), out);
 				}
 			} finally {
-				if(close)
+				if (close)
 					closeOutputStream(out);
 			}
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
-	 * @param charSet 数据写入时，所用编码格式
+	 * @param out
+	 *            输出流
+	 * @param charSet
+	 *            数据写入时，所用编码格式
 	 * 
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(String data, OutputStream out, 
-			String charSet) throws IOException{
+	public static void write(String data, OutputStream out, String charSet) throws IOException {
 		write(data, out, charSet, false);
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 *
@@ -1051,309 +1026,456 @@ public class XLPIOUtil {
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
+	 * @param out
+	 *            输出流
 	 * 
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(String data, OutputStream out) throws IOException{
+	public static void write(String data, OutputStream out) throws IOException {
 		write(data, out, null, false);
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
+	 * @param writer
+	 *            输出流
 	 * @param close
 	 *            是否关闭传入的流，=true，关闭，否则不关闭
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	private static void write(String data, Writer writer, 
-			boolean close) throws IOException{
-		if(data != null){
-			try{
+	private static void write(String data, Writer writer, boolean close) throws IOException {
+		if (data != null) {
+			try {
 				writer.write(data);
 				writer.flush();
-			}finally{
-				if(close)
+			} finally {
+				if (close)
 					closeWrite(writer);
 			}
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
+	 * @param writer
+	 *            输出流
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(String data, Writer writer) throws IOException{
+	public static void write(String data, Writer writer) throws IOException {
 		write(data, writer, false);
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param file 文件对象
-	 * @param charSet 编码格式
+	 * @param file
+	 *            文件对象
+	 * @param charSet
+	 *            编码格式
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件对象为null,则抛出该异常
+	 *             假如参数文件对象为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, File file, String charSet)
-			throws IOException{
+	public static void writeToFile(String data, File file, String charSet) throws IOException {
 		OutputStream out = new FileOutputStream(file);
 		write(data, out, charSet, true);
- 	}
-	
+	}
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param file 文件对象
+	 * @param file
+	 *            文件对象
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件对象为null,则抛出该异常
+	 *             假如参数文件对象为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, File file)
-			throws IOException{
+	public static void writeToFile(String data, File file) throws IOException {
 		writeToFile(data, file, null);
- 	}
-	
+	}
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param dir 文件目录
-	 * @param filename 文件名
+	 * @param dir
+	 *            文件目录
+	 * @param filename
+	 *            文件名
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件目录或文件名为null,则抛出该异常
+	 *             假如参数文件目录或文件名为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, String filename, File dir)
-			throws IOException{
+	public static void writeToFile(String data, String filename, File dir) throws IOException {
 		writeToFile(data, filename, dir, null);
- 	}
-	
+	}
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param dir 文件目录
-	 * @param filename 文件名
-	 * @param charSet 编码格式
+	 * @param dir
+	 *            文件目录
+	 * @param filename
+	 *            文件名
+	 * @param charSet
+	 *            编码格式
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件目录或文件名为null,则抛出该异常
+	 *             假如参数文件目录或文件名为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, String filename, File dir
-			, String charSet) throws IOException{
-		if(!dir.exists())
+	public static void writeToFile(String data, String filename, File dir, String charSet) throws IOException {
+		if (!dir.exists())
 			dir.mkdirs();
 		File file = new File(dir, filename);
 		writeToFile(data, file, charSet);
- 	}
-	
+	}
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param filePath 文件路径
-	 * @param charSet 编码格式
+	 * @param filePath
+	 *            文件路径
+	 * @param charSet
+	 *            编码格式
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件路径为null,则抛出该异常
+	 *             假如参数文件路径为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, String filePath
-			, String charSet) throws IOException{
-		if(filePath == null)
+	public static void writeToFile(String data, String filePath, String charSet) throws IOException {
+		if (filePath == null)
 			throw new NullPointerException("参数文件路径必须不为null");
-		
+
 		File file = new File(filePath);
 		File dir = file.getParentFile();
-		if(!dir.exists())
+		if (!dir.exists())
 			dir.mkdirs();
-		writeToFile(data, file, charSet);	
- 	}
-	
+		writeToFile(data, file, charSet);
+	}
+
 	/**
 	 * 把指定的数据写入指定的文件中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param filePath 文件路径
+	 * @param filePath
+	 *            文件路径
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数文件路径为null,则抛出该异常
+	 *             假如参数文件路径为null,则抛出该异常
 	 */
-	public static void writeToFile(String data, String filePath) 
-			throws IOException{
-		writeToFile(data, filePath, (String)null);
+	public static void writeToFile(String data, String filePath) throws IOException {
+		writeToFile(data, filePath, (String) null);
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
-	 * @param charSet 字符编码
+	 * @param writer
+	 *            输出流
+	 * @param charSet
+	 *            字符编码
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(byte[] data, Writer writer,
-			String charSet) throws IOException{
-		if(data != null){
-			if(XLPStringUtil.isEmpty(charSet))
+	public static void write(byte[] data, Writer writer, String charSet) throws IOException {
+		if (data != null) {
+			if (XLPStringUtil.isEmpty(charSet))
 				writer.write(new String(data));
 			else
 				writer.write(new String(data, charSet));
 			writer.flush();
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
-	 * @param charSet 字符编码
+	 * @param writer
+	 *            输出流
+	 * @param charSet
+	 *            字符编码
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(byte[] data, Writer writer,
-			Charset charSet) throws IOException{
-		if(data != null){
-			if(charSet == null)
+	public static void write(byte[] data, Writer writer, Charset charSet) throws IOException {
+		if (data != null) {
+			if (charSet == null)
 				writer.write(new String(data));
 			else
 				writer.write(new String(data, charSet));
 			writer.flush();
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
+	 * @param writer
+	 *            输出流
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(byte[] data, Writer writer) 
-			throws IOException{
-		write(data, writer, (Charset)null);
+	public static void write(byte[] data, Writer writer) throws IOException {
+		write(data, writer, (Charset) null);
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param writer 输出流
+	 * @param writer
+	 *            输出流
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(char[] data, Writer writer) 
-			throws IOException{
-		if(data != null){
+	public static void write(char[] data, Writer writer) throws IOException {
+		if (data != null) {
 			writer.write(data);
 			writer.flush();
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
-	 * @param charSetName 字符编码格式
+	 * @param out
+	 *            输出流
+	 * @param charSetName
+	 *            字符编码格式
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(char[] data, OutputStream out,
-			String charSetName) throws IOException{
-		if(data != null){
-			if(XLPStringUtil.isEmpty(charSetName))
+	public static void write(char[] data, OutputStream out, String charSetName) throws IOException {
+		if (data != null) {
+			if (XLPStringUtil.isEmpty(charSetName))
 				write(new String(data).getBytes(), out);
 			else
 				write(new String(data).getBytes(charSetName), out);
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
-	 * @param charSet 字符编码格式
+	 * @param out
+	 *            输出流
+	 * @param charSet
+	 *            字符编码格式
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(char[] data, OutputStream out,
-			Charset charSet) throws IOException{
-		if(data != null){
-			if(charSet == null)
+	public static void write(char[] data, OutputStream out, Charset charSet) throws IOException {
+		if (data != null) {
+			if (charSet == null)
 				write(new String(data).getBytes(), out);
 			else
 				write(new String(data).getBytes(charSet), out);
 		}
 	}
-	
+
 	/**
 	 * 把指定的数据写入指定的输出流中
 	 * 
 	 * @param data
 	 *            输入数据
-	 * @param out 输出流
+	 * @param out
+	 *            输出流
 	 * @throws IOException
 	 *             当IO操作出错时，抛出该异常
 	 * @throws NullPointerException
-	 * 				假如参数输出流为null,则抛出该异常
+	 *             假如参数输出流为null,则抛出该异常
 	 */
-	public static void write(char[] data, OutputStream out) 
-			throws IOException{
-		write(data, out, (String)null);
+	public static void write(char[] data, OutputStream out) throws IOException {
+		write(data, out, (String) null);
+	}
+
+	/**
+	 * 获得一个BufferedReader
+	 *
+	 * @param in
+	 *            输入流
+	 * @param charsetName
+	 *            字符集
+	 * @return BufferedReader对象
+	 */
+	public static BufferedReader getReader(InputStream in, String charsetName) {
+		Charset charset = XLPStringUtil.isEmpty(charsetName) ? null : Charset.forName(charsetName.trim());
+		return getReader(in, charset);
+	}
+	
+	/**
+	 * 获得一个BufferedReader
+	 *
+	 * @param in
+	 *            输入流
+	 * @param charset
+	 *            字符集
+	 * @return BufferedReader对象
+	 */
+	public static BufferedReader getReader(InputStream in, Charset charset) {
+		if (null == in) {
+			return null;
+		}
+
+		InputStreamReader reader;
+		if (charset == null) {
+			reader = new InputStreamReader(in);
+		} else {
+			reader = new InputStreamReader(in, charset);
+		}
+
+		return new BufferedReader(reader);
+	}
+	
+	/**
+	 * 获得一个BufferedReader
+	 *
+	 * @param reader
+	 *            输入流
+	 * @return BufferedReader对象
+	 */
+	public static BufferedReader getBufferedReader(Reader reader) {
+		if (null == reader) {
+			return null;
+		}
+		
+		return (reader instanceof BufferedReader) ? (BufferedReader) reader : new BufferedReader(reader);
+	}
+	
+	/**
+	 * 获得一个BufferedInputStream
+	 *
+	 * @param inputStream
+	 *            输入流
+	 * @return BufferedInputStream对象
+	 */
+	public static BufferedInputStream getBufferedInputStream(InputStream inputStream) {
+		if (null == inputStream) {
+			return null;
+		}
+		
+		return (inputStream instanceof BufferedInputStream) ? (BufferedInputStream) inputStream : new BufferedInputStream(inputStream);
+	}
+	
+	/**
+	 * 获得一个BufferedOutputStream
+	 *
+	 * @param outputStream
+	 *            输出流
+	 * @return BufferedOutputStream对象
+	 */
+	public static BufferedOutputStream getBufferedOutputStream(OutputStream outputStream) {
+		if (null == outputStream) {
+			return null;
+		}
+		
+		return (outputStream instanceof BufferedOutputStream) ? (BufferedOutputStream) outputStream : new BufferedOutputStream(outputStream);
+	}
+	
+	/**
+	 * 获得一个BufferedWriter
+	 *
+	 * @param out
+	 *            输出流
+	 * @param charsetName
+	 *            字符集
+	 * @return BufferedWriter对象
+	 */
+	public static BufferedWriter getWriter(OutputStream out, String charsetName) {
+		Charset charset = XLPStringUtil.isEmpty(charsetName) ? null : Charset.forName(charsetName.trim());
+		return getWriter(out, charset);
+	}
+	
+	/**
+	 * 获得一个BufferedWriter
+	 *
+	 * @param out
+	 *            输出流
+	 * @param charset
+	 *            字符集
+	 * @return BufferedWriter对象
+	 */
+	public static BufferedWriter getWriter(OutputStream out, Charset charset) {
+		if (null == out) {
+			return null;
+		}
+
+		OutputStreamWriter writer;
+		if (charset == null) {
+			writer = new OutputStreamWriter(out);
+		} else {
+			writer = new OutputStreamWriter(out, charset);
+		}
+
+		return new BufferedWriter(writer);
+	}
+	
+	/**
+	 * 获得一个BufferedWriter
+	 *
+	 * @param writer
+	 *            输出流
+	 * @return BufferedWriter对象
+	 */
+	public static BufferedWriter getBufferedWriter(Writer writer) {
+		if (null == writer) {
+			return null;
+		}
+		
+		return (writer instanceof BufferedWriter) ? (BufferedWriter) writer : new BufferedWriter(writer);
 	}
 }
