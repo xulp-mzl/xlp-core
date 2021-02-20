@@ -187,7 +187,8 @@ public class CSVReader {
 	 *            CSV文件
 	 * @throws NullPointerException
 	 *             假如参数为null，则抛该异常
-	 * @throws IllegalObjectException 假如给定的文件是目录或不存在，则抛出该异常
+	 * @throws IllegalObjectException
+	 *             假如给定的文件是目录或不存在，则抛出该异常
 	 * @throws CSVException
 	 *             从csv文件中读取数据失败，则抛出该异常
 	 */
@@ -196,10 +197,10 @@ public class CSVReader {
 		Reader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(csvFlie));
-			read(reader); 
+			read(reader);
 		} catch (FileNotFoundException e) {
 			throw new CSVException(e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeReader(reader);
 		}
 	}
@@ -223,14 +224,14 @@ public class CSVReader {
 		InputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(csvFlie);
-			read(inputStream, charsetName); 
+			read(inputStream, charsetName);
 		} catch (FileNotFoundException e) {
 			throw new CSVException(e);
-		}finally {
+		} finally {
 			XLPIOUtil.closeInputStream(inputStream);
 		}
 	}
-	
+
 	/**
 	 * 从csv格式字符串解析成CSV数据
 	 * 
@@ -252,13 +253,14 @@ public class CSVReader {
 	 *            CSV文件路径
 	 * @throws NullPointerException
 	 *             假如参数为空，则抛该异常
-	 * @throws IllegalObjectException 假如给定的文件是目录或不存在，则抛出该异常
+	 * @throws IllegalObjectException
+	 *             假如给定的文件是目录或不存在，则抛出该异常
 	 * @throws CSVException
 	 *             从csv文件中读取数据失败，则抛出该异常
 	 */
 	public void read(String csvFliePath) {
 		AssertUtils.isNotNull(csvFliePath, "csvFliePath paramter is null or empty!");
-		read(new File(csvFliePath)); 
+		read(new File(csvFliePath.trim()));
 	}
 
 	/**
@@ -277,9 +279,9 @@ public class CSVReader {
 	 */
 	public void read(String csvFliePath, String charsetName) {
 		AssertUtils.isNotNull(csvFliePath, "csvFliePath paramter is null or empty!");
-		read(new File(csvFliePath), charsetName); 
+		read(new File(csvFliePath.trim()), charsetName);
 	}
-	
+
 	/**
 	 * 从CSV数据字符数组集合中读取CSV数据
 	 * 
