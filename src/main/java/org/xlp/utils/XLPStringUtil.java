@@ -26,6 +26,11 @@ public class XLPStringUtil {
 	public final static String EMPTY = "";// 空""
 	public final static int INDEX_NOT_FOUND = -1;
 	public final static String NONE = null;// 空null
+	
+	/**
+	 * 字符串null
+	 */
+	public final static String NULL_STRING = "null";
 
 	/**
 	 * 返回一个不重复的字符串（uuid(全为大写) 并把中间的‘-’去掉了）
