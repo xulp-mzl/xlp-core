@@ -1,5 +1,6 @@
 package org.xlp.json.config;
 
+import org.xlp.utils.XLPStringUtil;
 
 /**
  * null数据转换的配置类
@@ -10,7 +11,7 @@ package org.xlp.json.config;
  */
 public class NullConfig {
 	//默认空值,除数字意外的null值，其余的null->""
-	private String none = "\"\"";
+	private String none = XLPStringUtil.NONE;
 	//标记是否开启null转换
 	private boolean open = false;
 	

@@ -17,8 +17,8 @@ public class NumberConfig {
 	private int decimalDigit = 2;
 	//浮点数保留取舍方式
 	private RoundingMode roundingMode = RoundingMode.HALF_UP;
-	//标记是否启用该功能，默认启用
-	private boolean open = true;
+	//标记是否启用该功能，默认关闭
+	private boolean open = false;
 	
 	public NumberConfig(){
 		
@@ -98,7 +98,7 @@ public class NumberConfig {
 			return intNumber.longValue() + sb.toString();
 		}
 		if(intNumber == null)
-			return "0";
+			return null;
 		return intNumber.longValue() + "";
 	}
 	
@@ -111,7 +111,7 @@ public class NumberConfig {
 	public String toDecimalString(Number decimalNumber){
 		if(decimalNumber == null){
 			if(!open)
-				return "0";
+				return null;
 			StringBuilder sb = new StringBuilder();
 			if(decimalDigit > 0)
 				sb.append(".");

@@ -59,7 +59,7 @@ public final class JsonArray extends Json{
 			i++;
 		}
 		if (!isEmpty())
-			formatSpace(jsonSB, spaceCount - SPACE_COUNT, isAddSpace);
+			formatSpace(jsonSB, spaceCount - this.spaceCount, isAddSpace);
 		jsonSB.append(JsonUtil.RIGHT_M);
 		String jsonString = jsonSB.toString();
 		return outJsoStringPreDeal == null ? jsonString :

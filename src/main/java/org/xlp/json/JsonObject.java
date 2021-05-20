@@ -748,7 +748,7 @@ public final class JsonObject extends Json{
 			i++;
 		}
 		if(!isEmpty())
-			formatSpace(jsonSB, spaceCount - SPACE_COUNT, isAddSpace);
+			formatSpace(jsonSB, spaceCount - this.spaceCount, isAddSpace);
 		jsonSB.append(JsonUtil.RIGHT_B);
 	}
 

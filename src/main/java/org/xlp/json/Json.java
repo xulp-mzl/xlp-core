@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 
+import org.xlp.assertion.AssertUtils;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonException;
 import org.xlp.json.utils.JsonUtil;
@@ -38,9 +39,14 @@ public abstract class Json{
 	protected static final int DOUBLE_QUOTES_LEN = JsonUtil.DOUBLE_QUOTES.length();
 	
 	/**
-	 * 默认缩进空格数目
+	 * 缩进空格数目
 	 */
-	protected static final int SPACE_COUNT = 2;
+	protected int spaceCount = DEFALUT_SPACE_COUNT;
+	
+	/**
+	 * 默认缩进空格数目为2
+	 */
+	protected static final int DEFALUT_SPACE_COUNT = 2;
 	
 	//""
 	protected static final String EMPTY = JsonUtil.EMPTY;
@@ -79,6 +85,9 @@ public abstract class Json{
 		boolean bean = je.isBean();
 		boolean isUsedAnnotation = je.isUsedAnnotation();
 		JsonConfig jsonConfig = je.getJsonConfig();
+		if (jsonConfig == null) {
+			jsonConfig = this.jsonConfig;
+		}
 		if(value == null && !jsonConfig.getNullConfig().isOpen())
 			return;
 		if(value == null){ //假如包含对空值进行处理
@@ -124,23 +133,26 @@ public abstract class Json{
 			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
 					.localTimeToString((LocalTime) value)).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (bean) {
-			jsonSB.append(JsonObject.fromBean(value, jsonConfig, isUsedAnnotation)
-					.format(spaceCount + SPACE_COUNT, isAddSpace));
-		}else if (JsonObject.class == cs) {
-			JsonObject jsonObject = (JsonObject) value;
-			jsonObject.setJsonConfig(jsonConfig);
-			jsonSB.append(jsonObject.format(spaceCount + SPACE_COUNT, isAddSpace));
+			Json json = JsonObject.fromBean(value, jsonConfig, isUsedAnnotation);
+			json.spaceCount = this.spaceCount;
+			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
+		}else if (Json.class.isAssignableFrom(cs)) {
+			Json json = (Json) value;
+			json.setJsonConfig(jsonConfig);
+			json.spaceCount = this.spaceCount;
+			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
 		}else if (value instanceof Map) {
-			jsonSB.append(JsonObject.fromMap((Map)value, jsonConfig).format(spaceCount + SPACE_COUNT, isAddSpace));
-		}else if (JsonArray.class == cs) {
-			JsonArray jsonArray = (JsonArray) value;
-			jsonArray.setJsonConfig(jsonConfig);
-			jsonSB.append(jsonArray.format(spaceCount + SPACE_COUNT, isAddSpace));
+			Json json = JsonObject.fromMap((Map)value, jsonConfig);
+			json.spaceCount = this.spaceCount;
+			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
 		}else if (cs != null && cs.isArray()) {
-			jsonSB.append(JsonArray.fromArray(value, jsonConfig).format(spaceCount + SPACE_COUNT, isAddSpace));
+			Json json = JsonArray.fromArray(value, jsonConfig);
+			json.spaceCount = this.spaceCount;
+			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
 		}else if (value instanceof Collection) {
-			jsonSB.append(JsonArray.fromCollection((Collection<?>) value, 
-					jsonConfig).format(spaceCount + SPACE_COUNT, isAddSpace));
+			Json json = JsonArray.fromCollection((Collection<?>) value, jsonConfig);
+			json.spaceCount = this.spaceCount;
+			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
 		}else if (cs == Boolean.TYPE || cs == Boolean.class) {
 			jsonSB.append(Boolean.TRUE.equals(value)); 
 		} else {
@@ -509,6 +521,7 @@ public abstract class Json{
 	 * @return
 	 */
 	public String format(int spaceCount) {
+		this.spaceCount = spaceCount;
 		return format(spaceCount, true);
 	}
 	
@@ -518,7 +531,7 @@ public abstract class Json{
 	 * @return
 	 */
 	public String format() {
-		return format(SPACE_COUNT);
+		return format(DEFALUT_SPACE_COUNT);
 	}
 	
 	/**
@@ -529,4 +542,66 @@ public abstract class Json{
 	 * @return
 	 */
 	abstract String format(int spaceCount, boolean isAddSpace);
+	
+	/**
+	 * 把给定的对象转换成jso格式的字符串
+	 * 
+	 * @param object 要转换的对象
+	 * @param jsonConfig
+	 * @param isFormat 是否格式化字符串，true：格式化 false：不格式化
+	 * @return 
+	 * @throws NullPointerException 假如给定的要转换的对象为null，则抛出该异常
+	 */
+	public static <T> String toJsonString(T object, JsonConfig jsonConfig, boolean isFormat){
+		AssertUtils.isNotNull(object, "object paramter is null!");
+		Class<?> cs = object.getClass();
+		Json json;
+		if (Json.class.isAssignableFrom(cs)) {
+			json = (Json) object;
+		}else if (Map.class.isAssignableFrom(cs)) {
+			json = JsonObject.fromMap((Map<?, ?>)object, jsonConfig);
+		}else if (Collection.class.isAssignableFrom(cs)) {
+			json = JsonArray.fromCollection((Collection<?>)object, jsonConfig);
+		}else if (cs.isArray()) {
+			json = JsonArray.fromArray(object, jsonConfig);
+		}else {
+			json = JsonObject.fromBean(object, jsonConfig, true);
+		}
+		return isFormat ? json.format() : json.toString();
+	}
+	
+	/**
+	 * 把给定的对象转换成jso格式的字符串
+	 * 
+	 * @param object 要转换的对象
+	 * @param isFormat 是否格式化字符串，true：格式化 false：不格式化
+	 * @return 
+	 * @throws NullPointerException 假如给定的要转换的对象为null，则抛出该异常
+	 */
+	public static <T> String toJsonString(T object, boolean isFormat){
+		return toJsonString(object, null, isFormat);
+	}
+	
+	/**
+	 * 把给定的对象转换成jso格式的字符串
+	 * 
+	 * @param object 要转换的对象
+	 * @param jsonConfig
+	 * @return 
+	 * @throws NullPointerException 假如给定的要转换的对象为null，则抛出该异常
+	 */
+	public static <T> String toJsonString(T object, JsonConfig jsonConfig){
+		return toJsonString(object, jsonConfig, false);
+	}
+	
+	/**
+	 * 把给定的对象转换成jso格式的字符串
+	 * 
+	 * @param object 要转换的对象
+	 * @return 
+	 * @throws NullPointerException 假如给定的要转换的对象为null，则抛出该异常
+	 */
+	public static <T> String toJsonString(T object){
+		return toJsonString(object, null, false);
+	}
 }
