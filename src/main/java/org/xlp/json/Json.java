@@ -16,6 +16,9 @@ import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonException;
 import org.xlp.json.utils.JsonUtil;
 import org.xlp.json.utils.PackingTypeUtil;
+import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPFormatterUtil;
+import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.XLPSystemParamUtil;
 import org.xlp.utils.XLPVerifedUtil;
 
@@ -85,17 +88,10 @@ public abstract class Json{
 		boolean bean = je.isBean();
 		boolean isUsedAnnotation = je.isUsedAnnotation();
 		JsonConfig jsonConfig = je.getJsonConfig();
-		if (jsonConfig == null) {
-			jsonConfig = this.jsonConfig;
-		}
 		if(value == null && !jsonConfig.getNullConfig().isOpen())
 			return;
 		if(value == null){ //假如包含对空值进行处理
-			if(PackingTypeUtil.isDecimalType(cs))
-				jsonSB.append(jsonConfig.getNumberConfig().toDecimalString(null));
-			else if(PackingTypeUtil.isNumberType(cs))
-				jsonSB.append(jsonConfig.getNumberConfig().toIntString(null));
-			else if(cs.isArray() || JsonArray.class == cs 
+			if(cs.isArray() || JsonArray.class == cs 
 					|| Collection.class.isAssignableFrom(cs))
 				jsonSB.append(JsonUtil.LEFT_M + JsonUtil.RIGHT_M);
 			else if(JsonObject.class == cs || Map.class.isAssignableFrom(cs))
@@ -105,33 +101,54 @@ public abstract class Json{
 			return;
 		}
 		
-		if(PackingTypeUtil.isDecimalType(cs)){
-			jsonSB.append(jsonConfig.getNumberConfig().toDecimalString((Number)value));
+		String formatter = je.getFormatter();
+		String strVal;
+		if ((cs == Long.TYPE || cs == Long.class) && XLPStringUtil.containSubString(formatter, "[yMmdHhs]")) {
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(XLPDateUtil.longDateFormat((Long)value, formatter))
+				.append(JsonUtil.DOUBLE_QUOTES);
+		}else if(PackingTypeUtil.isDecimalType(cs)){
+			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toDecimalString((Number)value)
+					: XLPFormatterUtil.format(formatter, (Number)value);
+			jsonSB.append(strVal);
 		}else if(PackingTypeUtil.isNumberType(cs)){
-			jsonSB.append(jsonConfig.getNumberConfig().toIntString((Number)value));
-		}else if (PackingTypeUtil.isNumber(value)) {
-			jsonSB.append(jsonConfig.getNumberConfig().toDecimalString((Number)value));
+			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toIntString((Number)value)
+					: XLPFormatterUtil.format(formatter, (Number)value);
+			jsonSB.append(strVal);
 		}else if (Date.class == cs || Timestamp.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.utilDateToString((Date) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().utilDateToString((Date) value)
+					: XLPDateUtil.dateToString((Date)value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (Time.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.timeToString((Time) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().timeToString((Time) value)
+					: XLPDateUtil.dateToString((Time)value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (java.sql.Date.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.dateToString((java.sql.Date) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().dateToString((java.sql.Date) value)
+					: XLPDateUtil.dateToString((java.sql.Date)value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (Calendar.class.isAssignableFrom(cs)) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.calendarToString((Calendar) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().calendarToString((Calendar) value)
+					: XLPDateUtil.dateToString(((Calendar)value).getTime(), formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (LocalDateTime.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.localDateTimeToString((LocalDateTime) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localDateTimeToString((LocalDateTime) value)
+					: XLPDateUtil.dateToString(value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (LocalDate.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.localDateToString((LocalDate) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localDateToString((LocalDate) value)
+					: XLPDateUtil.dateToString(value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (LocalTime.class == cs) {
-			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(jsonConfig.getDateFormatConfig()
-					.localTimeToString((LocalTime) value)).append(JsonUtil.DOUBLE_QUOTES);
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localTimeToString((LocalTime) value)
+					: XLPDateUtil.dateToString(value, formatter);
+			jsonSB.append(JsonUtil.DOUBLE_QUOTES).append(strVal).append(JsonUtil.DOUBLE_QUOTES);
 		}else if (bean) {
 			Json json = JsonObject.fromBean(value, jsonConfig, isUsedAnnotation);
 			json.spaceCount = this.spaceCount;
@@ -141,15 +158,15 @@ public abstract class Json{
 			json.setJsonConfig(jsonConfig);
 			json.spaceCount = this.spaceCount;
 			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
-		}else if (value instanceof Map) {
+		}else if (Map.class.isAssignableFrom(cs)) {
 			Json json = JsonObject.fromMap((Map)value, jsonConfig);
 			json.spaceCount = this.spaceCount;
 			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
-		}else if (cs != null && cs.isArray()) {
+		}else if (cs.isArray()) {
 			Json json = JsonArray.fromArray(value, jsonConfig);
 			json.spaceCount = this.spaceCount;
 			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));
-		}else if (value instanceof Collection) {
+		}else if (Collection.class.isAssignableFrom(cs)) {
 			Json json = JsonArray.fromCollection((Collection<?>) value, jsonConfig);
 			json.spaceCount = this.spaceCount;
 			jsonSB.append(json.format(spaceCount + this.spaceCount, isAddSpace));

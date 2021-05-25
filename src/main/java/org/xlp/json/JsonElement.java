@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.xlp.json.annotation.JsonFormatter;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonParseException;
 import org.xlp.json.jenum.Flag;
@@ -25,6 +26,7 @@ import org.xlp.json.utils.JsonUtil;
 import org.xlp.json.utils.PackingTypeUtil;
 import org.xlp.utils.XLPBooleanUtil;
 import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPFormatterUtil;
 import org.xlp.utils.XLPStringUtil;
 
 /**
@@ -49,9 +51,12 @@ public class JsonElement {
 	
 	private JsonConfig jsonConfig = new JsonConfig();
 	
-	public JsonElement(){
-		
-	}
+	/**
+	 * 字段格式化模式
+	 */
+	private String formatter;
+	
+	public JsonElement(){}
 	
 	public JsonElement(Class<?> type, Object value) {
 		this(type, value, false);
@@ -73,15 +78,49 @@ public class JsonElement {
 	 * @param bean
 	 * @param isUsedAnnotation 
 	 * 				标记当对象为Javabean，是否注解字段名称进行映射，值为true，是，false否
+	 * @param formatter 字段格式化模式
+	 * @param jsonConfig
+	 */
+	public JsonElement(Class<?> type, Object value, boolean bean, 
+			boolean isUsedAnnotation, JsonConfig jsonConfig, String formatter) {
+		this.type = type;
+		this.value = value;
+		this.bean = bean;
+		setJsonConfig(jsonConfig); 
+		this.isUsedAnnotation = isUsedAnnotation;
+		this.formatter = formatter;
+	}
+	
+	/**
+	 * 构造JsonElement对象
+	 * 
+	 * @param type
+	 * @param value
+	 * @param bean
+	 * @param isUsedAnnotation 
+	 * 				标记当对象为Javabean，是否注解字段名称进行映射，值为true，是，false否
+	 * @param formatter 字段格式化模式
+	 * @param jsonConfig
+	 */
+	public JsonElement(Class<?> type, Object value, boolean bean, 
+			boolean isUsedAnnotation, JsonConfig jsonConfig, JsonFormatter formatter) {
+		this(type, value, bean, isUsedAnnotation, jsonConfig);
+		setFormatter(formatter); 
+	}
+	
+	/**
+	 * 构造JsonElement对象
+	 * 
+	 * @param type
+	 * @param value
+	 * @param bean
+	 * @param isUsedAnnotation 
+	 * 				标记当对象为Javabean，是否注解字段名称进行映射，值为true，是，false否
 	 * @param jsonConfig
 	 */
 	public JsonElement(Class<?> type, Object value, boolean bean, 
 			boolean isUsedAnnotation, JsonConfig jsonConfig) {
-		this.type = type;
-		this.value = value;
-		this.bean = bean;
-		this.jsonConfig = jsonConfig;
-		this.isUsedAnnotation = isUsedAnnotation;
+		this(type, value, bean, isUsedAnnotation, jsonConfig, (String)null);
 	}
 	
 	public JsonElement(Class<?> type, Object value, boolean bean, JsonConfig jsonConfig) {
@@ -115,7 +154,7 @@ public class JsonElement {
 	public JsonConfig getJsonConfig() {
 		return jsonConfig;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -178,33 +217,65 @@ public class JsonElement {
 	 * @param value
 	 * @return
 	 */
-	private String objToString(Class<?> type, Object value) {
-		if(PackingTypeUtil.isDecimalType(type)){
-			return jsonConfig.getNumberConfig().toDecimalString((Number)value);
-		}else if(PackingTypeUtil.isNumberType(type)){
-			return jsonConfig.getNumberConfig().toIntString((Number)value);
-		}else if (PackingTypeUtil.isNumber(value)) {
-			return jsonConfig.getNumberConfig().toDecimalString((Number)value);
-		}else if (Date.class == type || Timestamp.class == type) {
-			return jsonConfig.getDateFormatConfig().utilDateToString((Date) value);
-		}else if (Time.class == type) {
-			return jsonConfig.getDateFormatConfig().timeToString((Time) value);
-		}else if (java.sql.Date.class == type) {
-			return jsonConfig.getDateFormatConfig().dateToString((java.sql.Date) value);
-		}else if (Calendar.class.isAssignableFrom(type)) {
-			return jsonConfig.getDateFormatConfig().calendarToString((Calendar) value);
-		}else if (LocalDateTime.class == type) {
-			return jsonConfig.getDateFormatConfig().localDateTimeToString((LocalDateTime) value);
-		}else if (LocalDate.class == type) {
-			return jsonConfig.getDateFormatConfig().localDateToString((LocalDate) value);
-		}else if (LocalTime.class == type) {
-			return jsonConfig.getDateFormatConfig().localTimeToString((LocalTime) value);
-		}else if (type.isArray() || JsonArray.class == type 
-				|| Collection.class.isAssignableFrom(type)) {
-			return getArrayString(type, value);
+	private String objToString(Class<?> cs, Object value) {
+		String strVal;
+		if ((cs == Long.TYPE || cs == Long.class) && XLPStringUtil.containSubString(formatter, "[yMmdHhs]")) {
+			strVal = XLPDateUtil.longDateFormat((Long)value, formatter);
+		}else if(PackingTypeUtil.isDecimalType(cs)){
+			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toDecimalString((Number)value)
+					: XLPFormatterUtil.format(formatter, (Number)value);
+		}else if(PackingTypeUtil.isNumberType(cs)){
+			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toIntString((Number)value)
+					: XLPFormatterUtil.format(formatter, (Number)value);
+		}else if (Date.class == cs || Timestamp.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().utilDateToString((Date) value)
+					: XLPDateUtil.dateToString((Date)value, formatter);
+		}else if (Time.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().timeToString((Time) value)
+					: XLPDateUtil.dateToString((Time)value, formatter);
+		}else if (java.sql.Date.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().dateToString((java.sql.Date) value)
+					: XLPDateUtil.dateToString((java.sql.Date)value, formatter);
+		}else if (Calendar.class.isAssignableFrom(cs)) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().calendarToString((Calendar) value)
+					: XLPDateUtil.dateToString(((Calendar)value).getTime(), formatter);
+		}else if (LocalDateTime.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localDateTimeToString((LocalDateTime) value)
+					: XLPDateUtil.dateToString(value, formatter);
+		}else if (LocalDate.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localDateToString((LocalDate) value)
+					: XLPDateUtil.dateToString(value, formatter);
+		}else if (LocalTime.class == cs) {
+			strVal = XLPStringUtil.isEmpty(formatter) 
+					? jsonConfig.getDateFormatConfig().localTimeToString((LocalTime) value)
+					: XLPDateUtil.dateToString(value, formatter);
+		}else if (bean) {
+			Json json = JsonObject.fromBean(value, jsonConfig, isUsedAnnotation);
+			strVal = json.toString();
+		}else if (Json.class.isAssignableFrom(cs)) {
+			Json json = (Json) value;
+			json.setJsonConfig(jsonConfig);
+			strVal = json.toString();
+		}else if (Map.class.isAssignableFrom(cs)) {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			Json json = JsonObject.fromMap((Map)value, jsonConfig);
+			strVal = json.toString();
+		}else if (cs.isArray()) {
+			Json json = JsonArray.fromArray(value, jsonConfig);
+			strVal = json.toString();
+		}else if (Collection.class.isAssignableFrom(cs)) {
+			Json json = JsonArray.fromCollection((Collection<?>) value, jsonConfig);
+			strVal = json.toString();
+		}else {
+			strVal = value.toString();
 		}
-		
-		return value.toString();
+		return strVal;
 	}
 	
 	/**
@@ -285,8 +356,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).intValue();
-		if(type == String.class)
-			return Integer.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).intValue();
+			}
+			return Integer.valueOf(value.toString());
+		}
 		throw throwJsonParseException("Integer");
 	}
 	
@@ -342,8 +417,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).byteValue();
-		if(type == String.class)
-			return Byte.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).byteValue();
+			}
+			return Byte.valueOf(value.toString());
+		}
 		throw throwJsonParseException("Byte");
 	}
 	
@@ -399,8 +478,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).shortValue();
-		if(type == String.class)
-			return Short.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).shortValue();
+			}
+			return Short.valueOf(value.toString());
+		}
 		throw throwJsonParseException("Short");
 	}
 	
@@ -456,12 +539,22 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).longValue();
-		if(type == String.class)
-			return Long.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if (XLPStringUtil.containSubString(formatter, "[yMmdHhs]")) {
+				return XLPDateUtil.stringDateToLong(value.toString(), formatter);
+			}else if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).longValue();
+			}
+			return Long.valueOf(value.toString());
+		}
 		if (value instanceof Date) 
 			return ((Date)value).getTime();
 		if (value instanceof LocalDateTime) 
 			return XLPDateUtil.localDateTimeToLongDate((LocalDateTime)value);
+		if (value instanceof LocalDate) 
+			return XLPDateUtil.localDateToLongDate((LocalDate)value);
+		if (value instanceof LocalTime)
+			return XLPDateUtil.localTimeToLongDate((LocalTime)value);
 		if (value instanceof Calendar) 
 			return ((Calendar)value).getTimeInMillis();
 		throw throwJsonParseException("Long");
@@ -519,8 +612,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).floatValue();
-		if(type == String.class)
-			return Float.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).floatValue();
+			}
+			return Float.valueOf(value.toString());
+		}
 		throw throwJsonParseException("Float");
 	}
 	
@@ -576,8 +673,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return ((Number)value).doubleValue();
-		if(type == String.class)
-			return Double.valueOf((String) value);
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString()).doubleValue();
+			}
+			return Double.valueOf(value.toString());
+		}
 		throw throwJsonParseException("Double");
 	}
 	
@@ -608,8 +709,12 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return (Number)value;
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type)){
+			if(!XLPStringUtil.isEmpty(formatter)) {
+				return XLPFormatterUtil.parse(formatter, value.toString());
+			}
 			return new BigDecimal((String) value);
+		}
 		throw throwJsonParseException("Number");
 	}
 	
@@ -640,8 +745,8 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return new BigInteger(value.toString());
-		if(type == String.class)
-			return new BigInteger((String) value);
+		if(CharSequence.class.isAssignableFrom(type))
+			return new BigInteger(value.toString());
 		throw throwJsonParseException("BigInteger");
 	}
 	
@@ -672,8 +777,8 @@ public class JsonElement {
 			return null;
 		if(PackingTypeUtil.isNumber(value))
 			return new BigDecimal(value.toString());
-		if(type == String.class)
-			return new BigDecimal((String) value);
+		if(CharSequence.class.isAssignableFrom(type))
+			return new BigDecimal(value.toString());
 		throw throwJsonParseException("BigDecimal");
 	}
 	
@@ -928,8 +1033,8 @@ public class JsonElement {
 			return jsonArray;
 		}
 		
-		if (type == String.class){
-			return JsonArray.fromJsonString((String) value, jsonConfig);
+		if (CharSequence.class.isAssignableFrom(type)){
+			return JsonArray.fromJsonString(value.toString(), jsonConfig);
 		}
 		
 		if(type.isArray())
@@ -1007,8 +1112,8 @@ public class JsonElement {
 			return JsonObject.fromMap((Map<?, ?>) value, jsonConfig);
 		}
 		
-		if (type == String.class){
-			return JsonObject.fromJsonString((String) value, jsonConfig);
+		if (CharSequence.class.isAssignableFrom(type)){
+			return JsonObject.fromJsonString(value.toString(), jsonConfig);
 		}
 		throw throwJsonParseException("JsonObject");
 	}
@@ -1258,9 +1363,9 @@ public class JsonElement {
 		}
 		if (value instanceof Number) 
 			return new Date(((Number) value).longValue());
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return XLPDateUtil.stringToDate((String) value, format);
+				return XLPDateUtil.stringToDate(value.toString(), format);
 			} catch (Exception e) {
 				throw throwJsonParseException("Date");
 			}
@@ -1275,7 +1380,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public Date getDate(){
-		return getDate(jsonConfig.getDateFormatConfig().getDateTimeFormat());
+		return getDate(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1326,9 +1432,9 @@ public class JsonElement {
 		
 		if(Timestamp.class == type)
 			return (Timestamp) value;
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return new Timestamp(XLPDateUtil.stringToDate((String) value, format)
+				return new Timestamp(XLPDateUtil.stringToDate(value.toString(), format)
 						.getTime());
 			} catch (Exception e) {
 				throw throwJsonParseException("Timestamp");
@@ -1344,7 +1450,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public Timestamp getTimestamp(){
-		return getTimestamp(jsonConfig.getDateFormatConfig().getDateTimeFormat());
+		return getTimestamp(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1394,9 +1501,9 @@ public class JsonElement {
 		
 		if(java.sql.Date.class == type)
 			return (java.sql.Date) value;
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return new java.sql.Date(XLPDateUtil.stringToDate((String) value, format)
+				return new java.sql.Date(XLPDateUtil.stringToDate(value.toString(), format)
 						.getTime());
 			} catch (Exception e) {
 				throw throwJsonParseException("Sql-Date");
@@ -1412,7 +1519,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public java.sql.Date getSqlDate(){
-		return getSqlDate(jsonConfig.getDateFormatConfig().getDateFormat());
+		return getSqlDate(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateFormat() : formatter);
 	}
 	
 	/**
@@ -1461,9 +1569,9 @@ public class JsonElement {
 			format = XLPDateUtil.TIME_DEFAULT_FORMAT;
 		if(Time.class == type)
 			return (Time) value;
-		if(String.class == type)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return new Time(XLPDateUtil.stringToDate((String) value, format)
+				return new Time(XLPDateUtil.stringToDate(value.toString(), format)
 						.getTime());
 			} catch (Exception e) {
 				throw throwJsonParseException("Time");
@@ -1479,7 +1587,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public Time getTime(){
-		return getTime(jsonConfig.getDateFormatConfig().getTimeFormat());
+		return getTime(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1538,11 +1647,11 @@ public class JsonElement {
 		}
 		if(Calendar.class.isAssignableFrom(type))
 			return (Calendar) value;
-		if(String.class == type){
+		if(CharSequence.class.isAssignableFrom(type)){
 			Calendar calendar = Calendar.getInstance();
 			Date date;
 			try {
-				date = XLPDateUtil.stringToDate((String) value, format);
+				date = XLPDateUtil.stringToDate(value.toString(), format);
 			} catch (Exception e) {
 				throw throwJsonParseException("Calendar");
 			}
@@ -1560,7 +1669,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public Calendar getCalendar(){
-		return getCalendar(jsonConfig.getDateFormatConfig().getDateTimeFormat());
+		return getCalendar(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1620,9 +1730,9 @@ public class JsonElement {
 			return XLPDateUtil.dateToLocalDateTime((Date)value); 
 		}
 		
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(format)); 
+				return LocalDateTime.parse(value.toString(), DateTimeFormatter.ofPattern(format)); 
 			} catch (Exception e) {
 				throw throwJsonParseException("LocalDateTime");
 			}
@@ -1638,7 +1748,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public LocalDateTime getLocalDateTime(){
-		return getLocalDateTime(jsonConfig.getDateFormatConfig().getDateTimeFormat());
+		return getLocalDateTime(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1702,9 +1813,9 @@ public class JsonElement {
 			return XLPDateUtil.dateToLocalDateTime((Date)value).toLocalDate(); 
 		}
 		
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return LocalDate.parse((String) value, DateTimeFormatter.ofPattern(format)); 
+				return LocalDate.parse(value.toString(), DateTimeFormatter.ofPattern(format)); 
 			} catch (Exception e) {
 				throw throwJsonParseException("LocalDate");
 			}
@@ -1720,7 +1831,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public LocalDate getLocalDate(){
-		return getLocalDate(jsonConfig.getDateFormatConfig().getDateFormat());
+		return getLocalDate(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getDateFormat() : formatter);
 	}
 	
 	/**
@@ -1785,9 +1897,9 @@ public class JsonElement {
 			return XLPDateUtil.dateToLocalDateTime((Date)value).toLocalTime(); 
 		}
 		
-		if(type == String.class)
+		if(CharSequence.class.isAssignableFrom(type))
 			try {
-				return LocalTime.parse((String) value, DateTimeFormatter.ofPattern(format)); 
+				return LocalTime.parse(value.toString(), DateTimeFormatter.ofPattern(format)); 
 			} catch (Exception e) {
 				throw throwJsonParseException("LocalTime");
 			}
@@ -1803,7 +1915,8 @@ public class JsonElement {
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public LocalTime getLocalTime(){
-		return getLocalTime(jsonConfig.getDateFormatConfig().getTimeFormat());
+		return getLocalTime(XLPStringUtil.isEmpty(formatter) 
+				? jsonConfig.getDateFormatConfig().getTimeFormat() : formatter);
 	}
 	
 	/**
@@ -1837,8 +1950,10 @@ public class JsonElement {
 		return v == null ? defaultValue : v;
 	}
 	
-	void setJsonConfig(JsonConfig jsonConfig) {
-		this.jsonConfig = jsonConfig;
+	public void setJsonConfig(JsonConfig jsonConfig) {
+		if (jsonConfig != null) {
+			this.jsonConfig = jsonConfig;
+		}
 	}
 	
 	/**
@@ -1917,5 +2032,32 @@ public class JsonElement {
 
 	public void setUsedAnnotation(boolean isUsedAnnotation) {
 		this.isUsedAnnotation = isUsedAnnotation;
+	}
+
+	/**
+	 * @return 字段格式化模式
+	 */
+	public String getFormatter() {
+		return formatter;
+	}
+
+	/**
+	 * 设置字段格式化模式
+	 * 
+	 * @param 字段格式化模式
+	 */
+	public void setFormatter(String formatter) {
+		this.formatter = formatter;
+	}
+	
+	/**
+	 * 设置字段格式化模式
+	 * 
+	 * @param 字段格式化模式
+	 */
+	public void setFormatter(JsonFormatter formatter) {
+		if (formatter != null) {
+			this.formatter = formatter.formatter();
+		}
 	}
 }

@@ -16,6 +16,7 @@ import org.xlp.javabean.JavaBeanPropertiesDescriptor;
 import org.xlp.javabean.PropertyDescriptor;
 import org.xlp.json.annotation.Bean;
 import org.xlp.json.annotation.FieldName;
+import org.xlp.json.annotation.JsonFormatter;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonException;
 import org.xlp.json.jenum.Flag;
@@ -808,6 +809,8 @@ public final class JsonObject extends Json{
 		
 		FieldName fn = null;
 		String fnAlias = null; //获取字段别名
+		//json字段格式化模式
+		JsonFormatter jsonFormatter;
 		for (PropertyDescriptor<T> pd : pds) {
 			fnAlias = null;
 			if (isUsedAnnotation) {
@@ -820,10 +823,11 @@ public final class JsonObject extends Json{
 				fnAlias = pd.getFieldName();
 			}
 			if (fnAlias != null) {
+				jsonFormatter = pd.getFieldAnnotation(JsonFormatter.class);
 				JsonElement jsonElement = new JsonElement(pd.getFiledClassType(),
 						BeanUtil.callGetter(bean, pd), 
 						pd.getFiledClassType().getAnnotation(Bean.class) != null, 
-						isUsedAnnotation, jsonConfig);
+						isUsedAnnotation, jsonConfig, jsonFormatter);
 				jsonObject.putElement(fnAlias, jsonElement);
 			}
 		}
@@ -1060,6 +1064,8 @@ public final class JsonObject extends Json{
 		Object value = null;
 		Class<?> fieldType;
 		String tempFieldName;
+		//json字段格式化模式
+		JsonFormatter jsonFormatter;
 		for (PropertyDescriptor<T> pd : pds) {
 			if (isUsedAnnotation) {
 				fieldName = pd.getFieldAnnotation(FieldName.class);
@@ -1082,8 +1088,12 @@ public final class JsonObject extends Json{
 							.getActualTypeArguments()[0];
 						value = getJsonElement(keyName).getCollectionBean(actualType, Flag.set);
 					}else {
-						value = new JsonValueProcesser().processValue(fieldType,
-								getJsonElement(keyName));
+						jsonFormatter = pd.getFieldAnnotation(JsonFormatter.class);
+						
+						JsonElement jsonElement = getJsonElement(keyName);
+						jsonElement.setFormatter(jsonFormatter);
+						value = new JsonValueProcesser().processValue(fieldType, jsonElement);
+						
 						if(value == null && fieldType.isPrimitive())
 							value = JsonValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
 					}

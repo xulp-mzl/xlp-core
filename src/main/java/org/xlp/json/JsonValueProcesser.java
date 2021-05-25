@@ -109,7 +109,7 @@ class JsonValueProcesser extends ValueProcesser{
 		} else if (fieldType.isAssignableFrom(Calendar.class)) {
 			value = jsonElement.getCalendar();
 		} else if (fieldType == String.class && (Collection.class.isAssignableFrom(valueType)
-				|| valueType == JsonArray.class)) {
+				|| valueType == JsonArray.class || valueType.isArray())) {
 			value = jsonElement.getArrayString();
 		} else if (JsonObject.class.equals(valueType) && !JsonObject.class.equals(fieldType)) {  
 			value = ((JsonObject)value).toBean(fieldType);
@@ -132,7 +132,7 @@ class JsonValueProcesser extends ValueProcesser{
 		} else if (fieldType.equals(JsonObject.class)) {
 			value = jsonElement.getJsonObject(jsonElement.getJsonConfig());
 		} else if (fieldType.equals(JsonArray.class)) {
-			value = jsonElement.getJsonArray(jsonElement.getJsonArray()); 
+			value = jsonElement.getJsonArray(jsonElement.getJsonConfig()); 
 		} 
 		
 		return value;

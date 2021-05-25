@@ -339,6 +339,30 @@ public class XLPDateUtil {
 	}
 	
 	/**
+	 * 将LocalDate转换long
+	 * 
+	 * @param localDate
+	 * @throws NullPointerException 假如参数为空，抛出该异常
+	 * @return 
+	 */
+	public static long localDateToLongDate(LocalDate localDate){
+		return localDateTimeToLongDate(localDate.atTime(0, 0, 0)); 
+	}
+	
+	/**
+	 * 将LocalTime转换long
+	 * 
+	 * @param localTime
+	 * @throws NullPointerException 假如参数为空，抛出该异常
+	 * @return 
+	 */
+	public static long localTimeToLongDate(LocalTime localTime){
+		return localTime.getHour() * 60 * 60 * 1000L 
+				+ localTime.getMinute() * 60 * 1000L
+				+ localTime.getSecond() * 1000; 
+	}
+
+	/**
 	 * 将LocalDateTime转换Calendar
 	 * 
 	 * @param localDateTime
