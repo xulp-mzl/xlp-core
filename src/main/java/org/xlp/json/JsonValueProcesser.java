@@ -115,7 +115,7 @@ class JsonValueProcesser extends ValueProcesser{
 				|| valueType == JsonArray.class || valueType.isArray())) {
 			value = jsonElement.getArrayString();
 		} else if (JsonObject.class.equals(valueType) && !JsonObject.class.equals(fieldType)) {  
-			value = ((JsonObject)value).toBean(fieldType);
+			value = ((JsonObject)value).toBean(fieldType, jsonElement.isUsedAnnotation());
 		} else if (fieldType.equals(LocalDateTime.class)){
 			value = jsonElement.getLocalDateTime();
 		} else if (fieldType.equals(LocalDate.class)) {
