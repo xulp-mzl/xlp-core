@@ -65,7 +65,10 @@ class JsonValueProcesser extends ValueProcesser{
 			
 			valueType = value.getClass(); 
 			jsonElement = new JsonElement(valueType, value, 
-					valueType.getAnnotation(Bean.class) != null, jsonElement.getJsonConfig());
+					valueType.getAnnotation(Bean.class) != null, 
+					jsonElement.isUsedAnnotation(),
+					jsonElement.getJsonConfig(),
+					jsonElement.getFormatter());
 		}else if (fieldType.isArray() && !valueType.isArray()) {
 			if (fieldType == char[].class && valueType.equals(String.class)) {
 				value = ((String)value).toCharArray();

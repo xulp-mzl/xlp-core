@@ -56,7 +56,7 @@ public class JsonElement {
 	 */
 	private String formatter;
 	
-	public JsonElement(){}
+	protected JsonElement(){}
 	
 	public JsonElement(Class<?> type, Object value) {
 		this(type, value, false);
@@ -102,7 +102,7 @@ public class JsonElement {
 	 * @param formatter 字段格式化模式
 	 * @param jsonConfig
 	 */
-	public JsonElement(Class<?> type, Object value, boolean bean, 
+	JsonElement(Class<?> type, Object value, boolean bean, 
 			boolean isUsedAnnotation, JsonConfig jsonConfig, JsonFormatter formatter) {
 		this(type, value, bean, isUsedAnnotation, jsonConfig);
 		setFormatter(formatter); 
@@ -131,7 +131,7 @@ public class JsonElement {
 		return type;
 	}
 	
-	public void setType(Class<?> type) {
+	void setType(Class<?> type) {
 		this.type = type;
 	}
 	
@@ -139,7 +139,7 @@ public class JsonElement {
 		return value;
 	}
 	
-	public void setValue(Object value) {
+	void setValue(Object value) {
 		this.value = value;
 	}
 
@@ -2055,7 +2055,7 @@ public class JsonElement {
 	 * 
 	 * @param 字段格式化模式
 	 */
-	public void setFormatter(JsonFormatter formatter) {
+	void setFormatter(JsonFormatter formatter) {
 		if (formatter != null) {
 			this.formatter = formatter.formatter();
 		}
