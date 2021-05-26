@@ -109,10 +109,16 @@ public abstract class Json{
 		}else if(PackingTypeUtil.isDecimalType(cs)){
 			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toDecimalString((Number)value)
 					: XLPFormatterUtil.format(formatter, (Number)value);
+			if (formatter != null && !formatter.matches("^[#0-9]*[.]{0,1}[#0-9]*$")) {
+				strVal = JsonUtil.DOUBLE_QUOTES + strVal + JsonUtil.DOUBLE_QUOTES; 
+			}
 			jsonSB.append(strVal);
 		}else if(PackingTypeUtil.isNumberType(cs)){
 			strVal = XLPStringUtil.isEmpty(formatter) ? jsonConfig.getNumberConfig().toIntString((Number)value)
 					: XLPFormatterUtil.format(formatter, (Number)value);
+			if (formatter != null && !formatter.matches("^[#0-9]*[.]{0,1}[#0-9]*$")) {
+				strVal = JsonUtil.DOUBLE_QUOTES + strVal + JsonUtil.DOUBLE_QUOTES; 
+			}
 			jsonSB.append(strVal);
 		}else if (Date.class == cs || Timestamp.class == cs) {
 			strVal = XLPStringUtil.isEmpty(formatter) 
