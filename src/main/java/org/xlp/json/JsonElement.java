@@ -1432,6 +1432,8 @@ public class JsonElement {
 		
 		if(Timestamp.class == type)
 			return (Timestamp) value;
+		if(Date.class == type)
+			return new Timestamp(((Date)value).getTime());
 		if(CharSequence.class.isAssignableFrom(type))
 			try {
 				return new Timestamp(XLPDateUtil.stringToDate(value.toString(), format)
@@ -1501,6 +1503,8 @@ public class JsonElement {
 		
 		if(java.sql.Date.class == type)
 			return (java.sql.Date) value;
+		if(Date.class == type)
+			return new java.sql.Date(((Date)value).getTime());
 		if(CharSequence.class.isAssignableFrom(type))
 			try {
 				return new java.sql.Date(XLPDateUtil.stringToDate(value.toString(), format)
@@ -1569,6 +1573,8 @@ public class JsonElement {
 			format = XLPDateUtil.TIME_DEFAULT_FORMAT;
 		if(Time.class == type)
 			return (Time) value;
+		if(Date.class == type)
+			return new Time(((Date)value).getTime());
 		if(CharSequence.class.isAssignableFrom(type))
 			try {
 				return new Time(XLPDateUtil.stringToDate(value.toString(), format)
