@@ -135,8 +135,7 @@ public class XLPFormatterUtil {
 		}
 		
 		//以下长整型字符串转成时间对象
-		if (XLPVerifedUtil.isInteger(parseStr) 
-				&& XLPStringUtil.containSubString(pattern, "[yMmdHhs]")) {
+		if (XLPVerifedUtil.isInteger(parseStr)) {
 			long longDate = Long.parseLong(parseStr);
 			if (toClassObject.equals(Date.class)){
 				return new Date(longDate); 
