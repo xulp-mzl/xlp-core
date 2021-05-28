@@ -12,6 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.xlp.utils.XLPArrayUtil;
+import org.xlp.utils.XLPOutputInfoUtil;
 import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.collection.XLPCollectionUtil;
 import org.xlp.utils.io.XLPIOUtil;
@@ -77,7 +78,7 @@ public class ZipUtils {
 		try {
 			zip.toZip(out, keepDirStructure); 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			XLPOutputInfoUtil.println(e.getMessage());
 			return false;
 		}
 		return true;
@@ -293,7 +294,7 @@ public class ZipUtils {
 		try {
 			zip.toZip(destFile, keepDirStructure);
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			XLPOutputInfoUtil.println(e.getMessage());
 			return false;
 		}
 		return true;
@@ -760,7 +761,7 @@ public class ZipUtils {
 				zos.closeEntry();
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			XLPOutputInfoUtil.println(e.getMessage());
 			return false;
 		} finally {
 			XLPIOUtil.closeOutputStream(zos);
@@ -855,7 +856,7 @@ public class ZipUtils {
 			zos.write(bytes);
 			zos.closeEntry();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			XLPOutputInfoUtil.println(e.getMessage());
 			return false;
 		} finally {
 			XLPIOUtil.closeOutputStream(zos);

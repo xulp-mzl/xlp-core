@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.xlp.utils.XLPOutputInfoUtil;
+
 /**
  * @version 1.0
  * @author 徐龙平
@@ -158,7 +160,7 @@ public class XLPCollectionUtil {
 			// 创建一个新的集合
 			newCollection = collection.getClass().newInstance();
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			XLPOutputInfoUtil.println(e1);
 		}
 
 		for (E e : collection) {

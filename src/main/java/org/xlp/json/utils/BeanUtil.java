@@ -1,6 +1,7 @@
 package org.xlp.json.utils;
 
 import org.xlp.javabean.PropertyDescriptor;
+import org.xlp.utils.XLPOutputInfoUtil;
 
 
 /**
@@ -25,7 +26,7 @@ public class BeanUtil {
 		try {
 			pd.executeWriteMethod(bean, value);
 		} catch (Exception e) {
-			System.out.println("----------调用[" + pd.getFieldName() + "]该字段的写方法失败---------");
+			XLPOutputInfoUtil.println("----------调用[" + pd.getFieldName() + "]该字段的写方法失败---------");
 		}
 	}
 
@@ -42,7 +43,7 @@ public class BeanUtil {
 		try {
 			return pd.executeReadMethod(bean);
 		} catch (Exception e) {
-			System.out.println("-----------调用[" + pd.getFieldName() + "]该字段的读方法失败---------");
+			XLPOutputInfoUtil.println("-----------调用[" + pd.getFieldName() + "]该字段的读方法失败---------");
 		}
 		return null;
 	}
@@ -61,10 +62,10 @@ public class BeanUtil {
 		try {
 			return beanClass.newInstance();
 		} catch (InstantiationException e) {
-			System.out.println("---------[" + beanClass.getName() + "]该类对象实例化失败------------");
+			XLPOutputInfoUtil.println("---------[" + beanClass.getName() + "]该类对象实例化失败------------");
 			throw new RuntimeException("bean对象实例化失败", e);
 		} catch (IllegalAccessException e) {
-			System.out.println("---------[" + beanClass.getName() + "]该类对象实例化失败-------------");
+			XLPOutputInfoUtil.println("---------[" + beanClass.getName() + "]该类对象实例化失败-------------");
 			throw new RuntimeException("bean对象实例化失败", e);
 		}
 	}

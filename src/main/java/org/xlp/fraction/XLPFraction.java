@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import org.xlp.utils.XLPOutputInfoUtil;
 import org.xlp.utils.io.XLPIOUtil;
 
 /**
@@ -176,9 +177,9 @@ public abstract class XLPFraction extends Number implements Serializable,
 			oi = new ObjectInputStream(bi);
 			return (oi.readObject());
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			XLPOutputInfoUtil.println(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			XLPOutputInfoUtil.println(e);
 		} finally {
 			XLPIOUtil.closeOutputStream(oo);
 			XLPIOUtil.closeInputStream(oi);

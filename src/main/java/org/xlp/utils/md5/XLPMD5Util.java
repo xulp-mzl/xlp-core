@@ -3,6 +3,8 @@ package org.xlp.utils.md5;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.xlp.utils.XLPOutputInfoUtil;
+
 public class XLPMD5Util {
 	/**
 	 * byte数组转换成16进制字符串
@@ -58,7 +60,7 @@ public class XLPMD5Util {
 				newString = bytesToHexString(md.digest());
 			} catch (NoSuchAlgorithmException e) {
 				newString = origin;
-				e.printStackTrace();
+				XLPOutputInfoUtil.println(e);
 			}
 		}
 

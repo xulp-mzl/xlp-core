@@ -43,7 +43,7 @@ public class XLPFormatterUtil {
 				formatValue = XLPDateUtil.dateToString(value, pattern);
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			XLPOutputInfoUtil.println(e.getMessage());
 			formatValue = value.toString();
 		}
 		return formatValue;

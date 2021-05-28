@@ -16,6 +16,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.xlp.utils.XLPOutputInfoUtil;
 import org.xlp.utils.io.XLPIOUtil;
 
 /**
@@ -104,7 +105,7 @@ public class XLPHttpRequestUtil {
 			connection.setRequestMethod(requestMethod);
 
 			connection.connect();
-			// System.out.println(charSet);
+			// XLPOutputInfoUtil.println(charSet);
 			// 当有数据需要提交时
 			if (null != data && requestMethod.equals(POST)) {
 				outputStream = connection.getOutputStream();
@@ -125,7 +126,7 @@ public class XLPHttpRequestUtil {
 				throw new Exception("响应码不为200为[" + code + "],获取相应数据失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			XLPOutputInfoUtil.println(e);
 		} finally {
 			// 释放资源
 			if (outputStream != null) {
@@ -193,7 +194,7 @@ public class XLPHttpRequestUtil {
 			connection.setRequestMethod(requestMethod);
 
 			connection.connect();
-			// System.out.println(charSet);
+			// XLPOutputInfoUtil.println(charSet);
 			// 当有数据需要提交时
 			if (null != data && requestMethod.equals(POST)) {
 				outputStream = connection.getOutputStream();
@@ -213,7 +214,7 @@ public class XLPHttpRequestUtil {
 				throw new Exception("响应码不为200为[" + code + "],获取相应数据失败");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			XLPOutputInfoUtil.println(e);
 		} finally {
 			// 释放资源
 			if (outputStream != null) {

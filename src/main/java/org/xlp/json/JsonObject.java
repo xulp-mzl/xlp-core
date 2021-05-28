@@ -22,6 +22,7 @@ import org.xlp.json.exception.JsonException;
 import org.xlp.json.jenum.Flag;
 import org.xlp.json.utils.BeanUtil;
 import org.xlp.json.utils.JsonUtil;
+import org.xlp.utils.XLPOutputInfoUtil;
 import org.xlp.utils.XLPStringUtil;
 
 
@@ -1098,7 +1099,7 @@ public final class JsonObject extends Json{
 							value = JsonValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
 					}
 				} catch (Exception e) {
-					System.out.println("----------调用[" + pd.getFieldName() + " ]该字段的写方法失败---------");
+					XLPOutputInfoUtil.println("----------调用[" + pd.getFieldName() + " ]该字段的写方法失败---------");
 				}
 				BeanUtil.callSetter(bean, pd, value);
 			}

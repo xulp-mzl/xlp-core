@@ -10,6 +10,7 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 
 import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPOutputInfoUtil;
 
 /**
  * 图片处理类
@@ -124,7 +125,7 @@ public class XLPImageUtil {
 		try {
 			return ImageIO.write(zoomImage, imageType, out);
 		} catch (Exception e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -157,7 +158,7 @@ public class XLPImageUtil {
 			}
 			return ImageIO.write(zoomImage, imageType, outFile);
 		} catch (Exception e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -257,7 +258,7 @@ public class XLPImageUtil {
 			imageUtil.transform(width, height);
 			return imageUtil.write(tagetFilePath);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -296,7 +297,7 @@ public class XLPImageUtil {
 			imageUtil.transform(scale);
 			return imageUtil.write(tagetFilePath);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -335,7 +336,7 @@ public class XLPImageUtil {
 			imageUtil.transform(width, height);
 			return imageUtil.write(targetFile);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -358,7 +359,7 @@ public class XLPImageUtil {
 			imageUtil.transform(scale);
 			return imageUtil.write(targetFile);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -384,7 +385,7 @@ public class XLPImageUtil {
 			imageUtil.transform(width, height);
 			return imageUtil.write(targetOut);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
@@ -408,7 +409,7 @@ public class XLPImageUtil {
 			imageUtil.transform(scale);
 			return imageUtil.write(targetOut);
 		} catch (IOException e) {
-			System.out.println("=================" + e.getMessage()
+			XLPOutputInfoUtil.println("=================" + e.getMessage()
 					+ "=================");
 		}
 		return false;
