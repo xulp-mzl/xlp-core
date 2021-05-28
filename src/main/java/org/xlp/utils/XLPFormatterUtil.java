@@ -95,6 +95,7 @@ public class XLPFormatterUtil {
 	 * @param toClassObject 转换的类型对象（可为数字类型和时间相关对象）
 	 * @return 假如参数为null，则返回null, 否则返回解析后的数字或时间对象
 	 * @throws RuntimeException 假如解析异常，则抛出该异常
+	 * @throws DateTimeParseException 假如解析异常，则抛出该异常
 	 * @throws IllegalArgumentException 假如 转换的类型对象不是数字类型和时间相关对象，则抛出该异常
 	 */
 	public static Object parse(String pattern, CharSequence value, Class<?> toClassObject) {
