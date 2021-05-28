@@ -134,38 +134,6 @@ public class XLPFormatterUtil {
 			return parse(pattern, value);
 		}
 		
-		//以下长整型字符串转成时间对象
-		if (XLPVerifedUtil.isInteger(parseStr)) {
-			long longDate = Long.parseLong(parseStr);
-			if (toClassObject.equals(Date.class)){
-				return new Date(longDate); 
-			} 
-			if (toClassObject.equals(java.sql.Date.class)) {
-				return new java.sql.Date(longDate); 
-			} 
-			if (toClassObject.equals(java.sql.Time.class)) {
-				return new Time(longDate);
-			} 
-			if (toClassObject.equals(Timestamp.class)) {
-				return new Timestamp(longDate);
-			} 
-			if (toClassObject.isAssignableFrom(Calendar.class)) {
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTimeInMillis(longDate);
-				return calendar;
-			} 
-			if (toClassObject.equals(LocalDateTime.class)){
-				return XLPDateUtil.longDateToLocalDateTime(longDate);
-			} 
-			if (toClassObject.equals(LocalDate.class)) {
-			    return XLPDateUtil.longDateToLocalDateTime(longDate).toLocalDate();
-			} 
-			if (toClassObject.equals(LocalTime.class)) {
-				return XLPDateUtil.longDateToLocalDateTime(longDate).toLocalTime();
-			}
-		}
-		
-		
 		//以下普通字符串解析成时间对象
 		if (toClassObject.equals(Date.class)){
 			return XLPDateUtil.stringToDate(parseStr, pattern); 
