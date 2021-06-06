@@ -8,8 +8,12 @@ import java.util.Map.Entry;
 
 import org.xlp.javabean.JavaBeanPropertiesDescriptor;
 import org.xlp.javabean.PropertyDescriptor;
+import org.xlp.javabean.annotation.Formatter;
 import org.xlp.javabean.processer.ValueProcesser;
 import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPFormatterUtil;
+import org.xlp.utils.XLPOutputInfoUtil;
+import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.collection.XLPCollectionUtil;
 
 /**
@@ -185,8 +189,16 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	public void callSetter(Object value, T bean, PropertyDescriptor<T> pd) {
 		Class<?> fieldType = pd.getFiledClassType();
 		// 对给定的值处理成适合bean字段的属性值
-		value = processer.processValue(fieldType, value);
-
+		Formatter formatter = pd.getFieldAnnotation(Formatter.class);
+		try{
+			if (formatter != null && !XLPStringUtil.isEmpty(formatter.formatter())) {
+				value = XLPFormatterUtil.parse(formatter.formatter(), value, fieldType);
+			} 
+			value = processer.processValue(fieldType, value);
+		} catch (Exception e) {
+			XLPOutputInfoUtil.println(pd.getFieldName() + "的值转换异常，" + e.getMessage());
+		}
+		
 		if (fieldType != null && value == null && fieldType.isPrimitive()) {
 			value = ValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
 		}

@@ -166,4 +166,24 @@ public class XLPFormatterUtil {
 		
 		throw new IllegalArgumentException(toClassObject.getName() + "不是数字或时间对象，转换失败");
 	}
+	
+	/**
+	 * 用指定的模式把指定的值转换成相应的类型对象
+	 * 
+	 * @param pattern 格式化模式
+	 * @param value 要转换的对象
+	 * @param toClassObject 转换的类型对象（可为数字类型和时间相关对象）
+	 * @return 假如参数为null，则返回null，假如要转换的对象非字符串，则返回源对象即（value参数值），否则返回转换后的对象
+	 */
+	public static Object parse(String pattern, Object value, Class<?> toClassObject) {
+		if (!(value instanceof CharSequence)) {
+			return value;
+		}
+		
+		if (XLPStringUtil.isEmpty(pattern) || toClassObject == null) {
+			return null;
+		}
+		
+		return parse(pattern, (CharSequence)value, toClassObject);
+	}
 }
