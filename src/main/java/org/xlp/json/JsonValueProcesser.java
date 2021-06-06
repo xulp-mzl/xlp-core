@@ -12,8 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.xlp.javabean.annotation.Bean;
 import org.xlp.javabean.processer.ValueProcesser;
-import org.xlp.json.annotation.Bean;
 
 /**
  * json对象转换bean时的值处理器

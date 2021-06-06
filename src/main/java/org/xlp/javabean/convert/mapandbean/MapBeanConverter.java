@@ -1,7 +1,7 @@
 package org.xlp.javabean.convert.mapandbean;
 
 import org.xlp.javabean.PropertyDescriptor;
-import org.xlp.javabean.convert.mapandbean.annotation.MapKey;
+import org.xlp.javabean.annotation.FieldName;
 import org.xlp.javabean.processer.ValueProcesser;
 import org.xlp.utils.XLPStringUtil;
 
@@ -67,9 +67,9 @@ public class MapBeanConverter<T> extends MapBeanAbstract<T>{
 	
 	private String virtualFieldName(PropertyDescriptor<T> pd) {
 		String virtualFieldName = null;
-		MapKey mapKey = pd.getFieldAnnotation(MapKey.class);
-		if(mapKey != null) {
-			String fieldName = XLPStringUtil.emptyTrim(mapKey.name());
+		FieldName mapKeyName = pd.getFieldAnnotation(FieldName.class);
+		if(mapKeyName != null) {
+			String fieldName = XLPStringUtil.emptyTrim(mapKeyName.name()); 
 			if (!XLPStringUtil.isEmpty(fieldName)) {
 				virtualFieldName = fieldName; 
 			}else {

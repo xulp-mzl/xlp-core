@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xlp.json.annotation.Bean;
+import org.xlp.javabean.annotation.Bean;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonException;
 import org.xlp.json.utils.JsonUtil;

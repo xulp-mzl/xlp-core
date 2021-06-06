@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.xlp.json.annotation.JsonFormatter;
+import org.xlp.javabean.annotation.Formatter;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonParseException;
 import org.xlp.json.jenum.Flag;
@@ -103,7 +103,7 @@ public class JsonElement {
 	 * @param jsonConfig
 	 */
 	JsonElement(Class<?> type, Object value, boolean bean, 
-			boolean isUsedAnnotation, JsonConfig jsonConfig, JsonFormatter formatter) {
+			boolean isUsedAnnotation, JsonConfig jsonConfig, Formatter formatter) {
 		this(type, value, bean, isUsedAnnotation, jsonConfig);
 		setFormatter(formatter); 
 	}
@@ -2061,7 +2061,7 @@ public class JsonElement {
 	 * 
 	 * @param 字段格式化模式
 	 */
-	void setFormatter(JsonFormatter formatter) {
+	void setFormatter(Formatter formatter) {
 		if (formatter != null) {
 			this.formatter = formatter.formatter();
 		}
