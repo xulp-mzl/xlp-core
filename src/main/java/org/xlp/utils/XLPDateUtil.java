@@ -1,18 +1,13 @@
 package org.xlp.utils;
 
+import org.xlp.assertion.AssertUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.xlp.assertion.AssertUtils;
 
 /**
  * 时间格式转换类
@@ -405,8 +400,9 @@ public class XLPDateUtil {
 	
 	/**
 	 * 将时间对象转换成指定格式的字符串
-	 * 
-	 * @param date
+	 *
+	 * @param dateObject
+	 * @param dateFormat
 	 * @throws NullPointerException 假如参数为空，抛出该异常
 	 * @throws IllegalArgumentException 假如dateObject对象不是时间对象，则抛出该异常
 	 */

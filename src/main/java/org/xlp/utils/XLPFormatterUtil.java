@@ -107,7 +107,7 @@ public class XLPFormatterUtil {
 				&& XLPStringUtil.containSubString(pattern, "[yMmdHhs]")) {
 			return XLPDateUtil.stringDateToLong(parseStr, pattern);
 		}
-		if (Number.class.isAssignableFrom(toClassObject)) {
+		if (XLPPackingTypeUtil.isNumberType(toClassObject) || toClassObject.isAssignableFrom(Number.class)) {
 			if (toClassObject.equals(Integer.TYPE)
 					|| toClassObject.equals(Integer.class)) {
 				return parse(pattern, value).intValue();

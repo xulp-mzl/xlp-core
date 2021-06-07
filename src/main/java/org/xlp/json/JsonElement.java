@@ -1,23 +1,5 @@
 package org.xlp.json;
 
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.xlp.javabean.annotation.Formatter;
 import org.xlp.json.config.JsonConfig;
 import org.xlp.json.exception.JsonParseException;
@@ -28,6 +10,17 @@ import org.xlp.utils.XLPBooleanUtil;
 import org.xlp.utils.XLPDateUtil;
 import org.xlp.utils.XLPFormatterUtil;
 import org.xlp.utils.XLPStringUtil;
+
+import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * json元素
@@ -213,7 +206,7 @@ public class JsonElement {
 	/**
 	 * 把一个对象变成string
 	 * 
-	 * @param type
+	 * @param cs
 	 * @param value
 	 * @return
 	 */
@@ -1387,7 +1380,6 @@ public class JsonElement {
 	/**
 	 * 获取JsonElement中的值
 	 * 
-	 * @param format 时间转换格式
 	 * @param defaultValue
 	 * @return 假如值为null或无法解析成给定类型的值，则返回defaultValue
 	 */
@@ -1748,7 +1740,6 @@ public class JsonElement {
 	/**
 	 * 获取JsonElement中的值
 	 * 
-	 * @param format 时间转换格式
 	 * @return 假如值为null，则返回null
 	 * @throws JsonParseException
 	 * 			假如无法解析成给定类型的值，则抛出该异常
@@ -1831,13 +1822,12 @@ public class JsonElement {
 	/**
 	 * 获取JsonElement中的值
 	 * 
-	 * @param format 时间转换格式
 	 * @return 假如值为null，则返回null
 	 * @throws JsonParseException
 	 * 			假如无法解析成给定类型的值，则抛出该异常
 	 */
 	public LocalDate getLocalDate(){
-		return getLocalDate(XLPStringUtil.isEmpty(formatter) 
+		return getLocalDate(XLPStringUtil.isEmpty(formatter)
 				? jsonConfig.getDateFormatConfig().getDateFormat() : formatter);
 	}
 	
@@ -1915,7 +1905,6 @@ public class JsonElement {
 	/**
 	 * 获取JsonElement中的值
 	 * 
-	 * @param format 时间转换格式
 	 * @return 假如值为null，则返回null
 	 * @throws JsonParseException
 	 * 			假如无法解析成给定类型的值，则抛出该异常
@@ -2050,7 +2039,7 @@ public class JsonElement {
 	/**
 	 * 设置字段格式化模式
 	 * 
-	 * @param 字段格式化模式
+	 * @param formatter 字段格式化模式
 	 */
 	public void setFormatter(String formatter) {
 		this.formatter = formatter;
@@ -2059,7 +2048,7 @@ public class JsonElement {
 	/**
 	 * 设置字段格式化模式
 	 * 
-	 * @param 字段格式化模式
+	 * @param formatter 字段格式化模式
 	 */
 	void setFormatter(Formatter formatter) {
 		if (formatter != null) {

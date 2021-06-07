@@ -1,6 +1,7 @@
 package org.xlp.javabean.config;
 
 import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPStringUtil;
 
 /**
  * 时间格式转换基本实现类
@@ -21,15 +22,13 @@ public class DateFormatConfig{
 	}
 	
 	public DateFormatConfig(String dateTimeFormat){
-		this.dateTimeFormat = dateTimeFormat;
+		setDateTimeFormat(dateTimeFormat);
 	}
 	
-	public DateFormatConfig(String dateTimeFormat, String dateFormat,
-			String timeFormat) {
-		super();
-		this.dateTimeFormat = dateTimeFormat;
-		this.dateFormat = dateFormat;
-		this.timeFormat = timeFormat;
+	public DateFormatConfig(String dateTimeFormat, String dateFormat, String timeFormat) {
+		this(dateTimeFormat);
+		setDateFormat(dateFormat);
+		setTimeFormat(timeFormat);
 	}
 
 	
@@ -38,7 +37,9 @@ public class DateFormatConfig{
 	}
 
 	public void setDateTimeFormat(String dateTimeFormat) {
-		this.dateTimeFormat = dateTimeFormat;
+		if (!XLPStringUtil.isEmpty(dateTimeFormat)) {
+			this.dateTimeFormat = dateTimeFormat;
+		}
 	}
 
 	public String getDateFormat() {
@@ -46,7 +47,9 @@ public class DateFormatConfig{
 	}
 
 	public void setDateFormat(String dateFormat) {
-		this.dateFormat = dateFormat;
+		if (!XLPStringUtil.isEmpty(dateFormat)) {
+			this.dateFormat = dateFormat;
+		}
 	}
 
 	public String getTimeFormat() {
@@ -54,6 +57,8 @@ public class DateFormatConfig{
 	}
 
 	public void setTimeFormat(String timeFormat) {
-		this.timeFormat = timeFormat;
+		if (!XLPStringUtil.isEmpty(timeFormat)) {
+			this.timeFormat = timeFormat;
+		}
 	}
 }

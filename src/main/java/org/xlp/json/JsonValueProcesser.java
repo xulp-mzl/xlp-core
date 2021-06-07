@@ -1,19 +1,16 @@
 package org.xlp.json;
 
+import org.xlp.javabean.annotation.Bean;
+import org.xlp.javabean.processer.ValueProcesser;
+
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.xlp.javabean.annotation.Bean;
-import org.xlp.javabean.processer.ValueProcesser;
+import java.util.*;
 
 /**
  * json对象转换bean时的值处理器
@@ -39,43 +36,24 @@ class JsonValueProcesser extends ValueProcesser{
 		
 		//当字段类型不是数组类型时而value的值是数组时，处理成适合的值
 		if (!fieldType.isArray() && valueType.isArray()) {
-			if (valueType == byte[].class && ((byte[])value).length > 0) {
-				value = ((byte[])value)[0];
-			}else if (valueType == int[].class && ((int[])value).length > 0) {
-				value = ((int[])value)[0];
-			}else if (valueType == short[].class && ((short[])value).length > 0) {
-				value = ((short[])value)[0];
-			}else if (valueType == long[].class && ((long[])value).length > 0) {
-				value = ((long[])value)[0];
-			}else if (valueType == char[].class && ((char[])value).length > 0) {
-				value = ((char[])value)[0];
-			}else if (valueType == float[].class && ((float[])value).length > 0) {
-				value = ((float[])value)[0];
-			}else if (valueType == double[].class && ((double[])value).length > 0) {
-				value = ((double[])value)[0];
-			}else if (fieldType == String.class && valueType != String[].class) {
-				value = jsonElement.getArrayString();
-			}else if (valueType == boolean[].class && ((boolean[])value).length > 0) {
-				value = ((boolean[])value)[0];
-			}else if ((value instanceof Object[]) && ((Object[])value).length > 0) {
-				value = ((Object[])value)[0];
-			}else {
-				return null;
-			}
-			
-			valueType = value.getClass(); 
+			int length = Array.getLength(value);//用反射获取数组的长度
+			if (length == 0) return null;
+			value = Array.get(value, 0);//用反射获取数组中的元素;
+			if (value == null) return null;
+			valueType = value.getClass();
 			jsonElement = new JsonElement(valueType, value, 
 					valueType.getAnnotation(Bean.class) != null, 
 					jsonElement.isUsedAnnotation(),
 					jsonElement.getJsonConfig(),
 					jsonElement.getFormatter());
-		}else if (fieldType.isArray() && !valueType.isArray()) {
-			if (fieldType == char[].class && valueType.equals(String.class)) {
-				value = ((String)value).toCharArray();
-			}
 		}
-		
-		if (fieldType.equals(String.class)) {
+
+		if (fieldType == char[].class && CharSequence.class.isAssignableFrom(valueType)) {
+			value = value.toString().toCharArray();
+		} else if (fieldType.equals(String.class) && (Collection.class.isAssignableFrom(valueType)
+				|| valueType.equals(JsonArray.class) || valueType.isArray())) {
+			value = jsonElement.getArrayString();
+		} else if (fieldType.equals(String.class)) {
 			value = jsonElement.getString();
 		} else if (fieldType.equals(Integer.TYPE)
 				|| fieldType.equals(Integer.class)) {
@@ -111,10 +89,7 @@ class JsonValueProcesser extends ValueProcesser{
 			value = jsonElement.getTimestamp();
 		} else if (fieldType.isAssignableFrom(Calendar.class)) {
 			value = jsonElement.getCalendar();
-		} else if (fieldType == String.class && (Collection.class.isAssignableFrom(valueType)
-				|| valueType == JsonArray.class || valueType.isArray())) {
-			value = jsonElement.getArrayString();
-		} else if (JsonObject.class.equals(valueType) && !JsonObject.class.equals(fieldType)) {  
+		} else if (JsonObject.class.equals(valueType) && !JsonObject.class.equals(fieldType)) {
 			value = ((JsonObject)value).toBean(fieldType, jsonElement.isUsedAnnotation());
 		} else if (fieldType.equals(LocalDateTime.class)){
 			value = jsonElement.getLocalDateTime();
@@ -137,7 +112,6 @@ class JsonValueProcesser extends ValueProcesser{
 		} else if (fieldType.equals(JsonArray.class)) {
 			value = jsonElement.getJsonArray(jsonElement.getJsonConfig()); 
 		} 
-		
 		return value;
 	}
 }

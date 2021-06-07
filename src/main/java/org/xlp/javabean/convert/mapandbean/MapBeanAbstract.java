@@ -1,20 +1,19 @@
 package org.xlp.javabean.convert.mapandbean;
 
+import org.xlp.javabean.JavaBeanPropertiesDescriptor;
+import org.xlp.javabean.PropertyDescriptor;
+import org.xlp.javabean.annotation.Formatter;
+import org.xlp.javabean.config.DateFormatConfig;
+import org.xlp.javabean.processer.ValueProcesser;
+import org.xlp.utils.*;
+import org.xlp.utils.collection.XLPCollectionUtil;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.xlp.javabean.JavaBeanPropertiesDescriptor;
-import org.xlp.javabean.PropertyDescriptor;
-import org.xlp.javabean.annotation.Formatter;
-import org.xlp.javabean.processer.ValueProcesser;
-import org.xlp.utils.XLPDateUtil;
-import org.xlp.utils.XLPFormatterUtil;
-import org.xlp.utils.XLPOutputInfoUtil;
-import org.xlp.utils.XLPStringUtil;
-import org.xlp.utils.collection.XLPCollectionUtil;
 
 /**
  * map与bean相互转换抽象类
@@ -30,7 +29,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	// 标志map中是否存储bean字段值为空的条目
 	private boolean isContainNull = false;
 	// map值处理器
-	private final ValueProcesser processer;
+	private ValueProcesser processer = new MapValueProcesser();
 
 	public MapBeanAbstract() {
 		this(XLPDateUtil.DATE_FORMAT);
@@ -71,7 +70,9 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 *            标志map中是否存储bean字段值为空的条目
 	 */
 	public MapBeanAbstract(ValueProcesser processer, boolean isContainNull) {
-		this.processer = processer;
+		if (processer != null) {
+			this.processer = processer;
+		}
 		this.isContainNull = isContainNull;
 	}
 
@@ -137,7 +138,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 * 用给定的map->bean
 	 * 
 	 * @param map
-	 * @param bean
+	 * @param cs
 	 * @param pds
 	 */
 	private T createBean(Map<String, ?> map, Class<T> cs,
@@ -188,17 +189,33 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 */
 	public void callSetter(Object value, T bean, PropertyDescriptor<T> pd) {
 		Class<?> fieldType = pd.getFiledClassType();
-		// 对给定的值处理成适合bean字段的属性值
-		Formatter formatter = pd.getFieldAnnotation(Formatter.class);
-		try{
-			if (formatter != null && !XLPStringUtil.isEmpty(formatter.formatter())) {
-				value = XLPFormatterUtil.parse(formatter.formatter(), value, fieldType);
-			} 
-			value = processer.processValue(fieldType, value);
-		} catch (Exception e) {
-			XLPOutputInfoUtil.println(pd.getFieldName() + "的值转换异常，" + e.getMessage());
+		if (value != null){
+			// 对给定的值处理成适合bean字段的属性值
+			Formatter formatter = pd.getFieldAnnotation(Formatter.class);
+			//当字段类型不是数组类型时而value的值是数组时，处理成适合的值
+			if (!fieldType.isArray() && value.getClass().isArray()) {
+				int length = Array.getLength(value);//用反射获取数组的长度
+				value = length > 0 ? Array.get(value, 0) : null;//用反射获取数组中的元素;
+			}
+			String format;
+			try{
+				if (value != null && formatter != null
+						&& !XLPStringUtil.isEmpty(format = formatter.formatter())) {
+					if ((XLPPackingTypeUtil.isNumberType(fieldType) || fieldType.isAssignableFrom(Number.class))
+							&& CharSequence.class.isAssignableFrom(value.getClass())){
+						value = XLPFormatterUtil.parse(format, (CharSequence) value, fieldType);
+					} else {
+						DateFormatConfig dateFormatConfig = new DateFormatConfig(format, format, format);
+						ValueProcesser processer = new MapValueProcesser(dateFormatConfig);
+						value = processer.processValue(fieldType, value);
+					}
+				} else {
+					value = processer.processValue(fieldType, value);
+				}
+			} catch (Exception e) {
+				XLPOutputInfoUtil.println(pd.getFieldName() + "的值转换异常，" + e.getMessage());
+			}
 		}
-		
 		if (fieldType != null && value == null && fieldType.isPrimitive()) {
 			value = ValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
 		}
@@ -206,7 +223,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 		try {
 			pd.executeWriteMethod(bean, value);
 		} catch (Exception e) {
-
+			XLPOutputInfoUtil.println(pd.getFieldName() + "的值设置异常，" + e.getMessage());
 		}
 	}
 
@@ -300,7 +317,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	/**
 	 * 把List<T> beaList转换成List<Map<String, Object>> Maps
 	 * 
-	 * @param beaList
+	 * @param beanList
 	 * @return
 	 */
 	@Override

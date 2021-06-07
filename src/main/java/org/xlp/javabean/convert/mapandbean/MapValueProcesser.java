@@ -1,21 +1,18 @@
 package org.xlp.javabean.convert.mapandbean;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-
 import org.xlp.javabean.config.DateFormatConfig;
 import org.xlp.javabean.processer.ValueProcesser;
 import org.xlp.utils.XLPBooleanUtil;
 import org.xlp.utils.XLPDateUtil;
+
+import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * map值处理器
@@ -29,10 +26,9 @@ import org.xlp.utils.XLPDateUtil;
  */
 public class MapValueProcesser extends ValueProcesser{
 	// 字符串日期相互转换格式
-	private DateFormatConfig config;
+	private DateFormatConfig config = new DateFormatConfig();
 	
 	public MapValueProcesser(){
-		this(new DateFormatConfig());
 	}
 	
 	/**
@@ -46,7 +42,9 @@ public class MapValueProcesser extends ValueProcesser{
 	 * @param config 字符串日期相互转换格式
 	 */
 	public MapValueProcesser(DateFormatConfig config){
-		this.config = config;
+		if (config != null) {
+			this.config = config;
+		}
 	}
 	
 	/**
@@ -67,27 +65,11 @@ public class MapValueProcesser extends ValueProcesser{
 		
 		//当字段类型不是数组类型时而value的值是数组时，处理成适合的值
 		if (!fieldType.isArray() && valueType.isArray()) {
-			if (valueType == byte[].class && ((byte[])value).length > 0) {
-				value = ((byte[])value)[0];
-			}else if (valueType == int[].class && ((int[])value).length > 0) {
-				value = ((int[])value)[0];
-			}else if (valueType == short[].class && ((short[])value).length > 0) {
-				value = ((short[])value)[0];
-			}else if (valueType == long[].class && ((long[])value).length > 0) {
-				value = ((long[])value)[0];
-			}else if (valueType == char[].class && ((char[])value).length > 0) {
-				value = ((char[])value)[0];
-			}else if (valueType == float[].class && ((float[])value).length > 0) {
-				value = ((float[])value)[0];
-			}else if (valueType == double[].class && ((double[])value).length > 0) {
-				value = ((double[])value)[0];
-			}else if (valueType == boolean[].class && ((boolean[])value).length > 0) {
-				value = ((boolean[])value)[0];
-			}else if ((value instanceof Object[]) && ((Object[])value).length > 0) {
-				value = ((Object[])value)[0];
-			}else {
-				return null;
-			}
+			int length = Array.getLength(value);//用反射获取数组的长度
+			if (length == 0) return null;
+			value = Array.get(value, 0);//用反射获取数组中的元素;
+			if (value == null) return null;
+			valueType = value.getClass();
 		}
 		
 		if (fieldType.equals(String.class)) {
@@ -124,6 +106,10 @@ public class MapValueProcesser extends ValueProcesser{
 						.toInstant().toEpochMilli();
 			}else if (value instanceof Calendar) {
 				value = ((Calendar)value).getTimeInMillis();
+			}else if (value instanceof LocalDate) {
+				value = XLPDateUtil.localDateToLongDate((LocalDate) value);
+			}else if (value instanceof LocalTime) {
+				value = XLPDateUtil.localTimeToLongDate((LocalTime) value);
 			}else {
 				value = Long.valueOf(value.toString());
 			}
@@ -220,8 +206,8 @@ public class MapValueProcesser extends ValueProcesser{
 			}
 		}
 		
-		if (fieldType == char[].class && valueType.equals(String.class)) {
-			value = ((String)value).toCharArray();
+		if (fieldType == char[].class && CharSequence.class.isAssignableFrom(valueType)) {
+			value = value.toString().toCharArray();
 		}
 		return value;
 	}
