@@ -50,8 +50,7 @@ public class XLPCollectionUtil {
 	 *            分隔符
 	 * @return 假如指定的集合为null或size=0，返回"",否则返回以指定分隔符分隔的字符串
 	 */
-	public static <E> String toCleanNullStr(Collection<E> collection,
-			String split) {
+	public static <E> String toCleanNullStr(Collection<E> collection, String split) {
 		return toString(collection, null, split, null, true);
 	}
 
@@ -69,8 +68,8 @@ public class XLPCollectionUtil {
 	 *            表示当集合中存在null时，是否清除返回此集合的字符串，此值设为false清除，否则不清楚
 	 * @return 假如指定的集合为null或size=0，返回"",否则返回以指定分隔符分隔的字符串
 	 */
-	private static <E> String toString(Collection<E> collection, String prefix,
-			String split, String suffix, boolean cleanNull) {
+	private static <E> String toString(Collection<E> collection, String prefix, String split, String suffix,
+			boolean cleanNull) {
 		StringBuffer sb = new StringBuffer();
 		if (prefix != null)
 			sb.append(prefix);// 添加前缀
@@ -105,8 +104,7 @@ public class XLPCollectionUtil {
 	 *            后缀，假如此值设为null，则无后缀
 	 * @return 假如指定的集合为null或size=0，返回prefix + "" + suffix,否则返回以指定分隔符分隔的字符串
 	 */
-	public static <E> String toCleanNullStr(Collection<E> collection,
-			String prefix, String split, String suffix) {
+	public static <E> String toCleanNullStr(Collection<E> collection, String prefix, String split, String suffix) {
 		return toString(collection, prefix, split, suffix, true);
 	}
 
@@ -122,8 +120,7 @@ public class XLPCollectionUtil {
 	 *            后缀，假如此值设为null，则无后缀
 	 * @return 假如指定的集合为null或size=0，返回prefix + "" + suffix,否则返回以指定分隔符分隔的字符串
 	 */
-	public static <E> String toString(Collection<E> collection, String prefix,
-			String split, String suffix) {
+	public static <E> String toString(Collection<E> collection, String prefix, String split, String suffix) {
 		return toString(collection, prefix, split, suffix, false);
 	}
 
@@ -135,8 +132,7 @@ public class XLPCollectionUtil {
 	 * @return 假如给定的集合大小为0返回null，否则返回给定的集合
 	 */
 	public static <E> Collection<E> toNull(Collection<E> collection) {
-		return (collection != null && collection.size() == 0) ? null
-				: collection;
+		return (collection != null && collection.size() == 0) ? null : collection;
 	}
 
 	/**
@@ -151,8 +147,7 @@ public class XLPCollectionUtil {
 	 *         假如内部出错，也返回null
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E> Collection<E> removeValue(Collection<E> collection,
-			Object value) {
+	public static <E> Collection<E> removeValue(Collection<E> collection, Object value) {
 		if (isEmpty(collection))
 			return collection;
 		Collection<E> newCollection = null;
@@ -164,8 +159,7 @@ public class XLPCollectionUtil {
 		}
 
 		for (E e : collection) {
-			if ((e == null && value == null)
-					|| (e != null && (e == value || e.equals(value))))// 移除指定的值
+			if ((e == null && value == null) || (e != null && (e == value || e.equals(value))))// 移除指定的值
 				continue;
 			newCollection.add(e);
 		}
@@ -217,7 +211,7 @@ public class XLPCollectionUtil {
 		for (E e : array)
 			collection.add(e);
 	}
-	
+
 	/**
 	 * 通过参数获取一个ArrayList对象
 	 * 
@@ -225,11 +219,44 @@ public class XLPCollectionUtil {
 	 * @return ArrayList<E>
 	 */
 	@SafeVarargs
-	public static <E> List<E> initList(E... params){ 
+	public static <E> List<E> initList(E... params) {
 		List<E> list = new ArrayList<E>();
 		if (params != null) {
 			for (E param : params) {
 				list.add(param);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * 从给定的list中截取指定范围的子list，原list元素不变
+	 * 
+	 * @param sourceList
+	 *            源数据
+	 * @param from
+	 *            开始截取的下标（包括该值），假如为负值，则反向截取
+	 * @param to
+	 *            结束截取的下标（不包括该值），假如为负值，则反向截取
+	 * @return 返回截取的子list，假如参数为非法值（源数据为空或下标不合法），则返回空list
+	 */
+	public static <E> List<E> subList(List<E> sourceList, int from, int to) {
+		List<E> list = new ArrayList<E>();
+		if(sourceList == null) return list;
+		int size = sourceList.size();
+		if (from >= 0 && (from >= size || from >= to)) return list;
+		if (from < 0 && (from <= to || -from > size )) return list;
+		//正向截取
+		if (from >= 0) {
+			to = to >= size ? size : to;
+			for(int i = from; i < to; i++){
+				list.add(sourceList.get(i));
+			}
+		} else {
+			//反向截取，并倒置
+			to = -to >= size ? -size : to;
+			for(int i = size + from, end = size + to; i >= end; i--){
+				list.add(sourceList.get(i));
 			}
 		}
 		return list;
