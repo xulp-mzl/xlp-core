@@ -627,4 +627,35 @@ public abstract class Json{
 	public static <T> String toJsonString(T object){
 		return toJsonString(object, null, false);
 	}
+	
+	/**
+	 * 把json字符解析成json对象
+	 * 
+	 * @param jsonString 解析字符成
+	 * @return
+	 * @throws JsonException 假如json解析异常，则抛出该异常
+	 */
+	public static Json parseText(String jsonString){
+		return parseText(jsonString, null);
+	}
+	
+	/**
+	 * 把json字符解析成json对象
+	 * 
+	 * @param jsonString 解析字符成
+	 * @param jsonConfig
+	 * @return
+	 * @throws JsonException 假如json解析异常，则抛出该异常
+	 */
+	public static Json parseText(String jsonString, JsonConfig jsonConfig){
+		if (XLPStringUtil.isEmpty(jsonString)) {
+			return null;
+		}
+		jsonString = jsonString.trim();
+		if (jsonString.startsWith("{")) {
+			return JsonObject.fromJsonString(jsonString, jsonConfig);
+		} else {
+			return JsonArray.fromJsonString(jsonString, jsonConfig);
+		}
+	}
 }
