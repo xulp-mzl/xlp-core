@@ -65,13 +65,18 @@ public class DefaultMapBean<T> extends MapBeanAbstract<T>{
 	}
 	
 	@Override
-	protected String virtualReadFieldName(PropertyDescriptor<T> pd) {
+	protected String virtualReadFieldName(PropertyDescriptor<?> pd) {
 		return pd.getFieldName();
 	}
 
 	@Override
-	protected String virtualWriteFieldName(PropertyDescriptor<T> pd) {
+	protected String virtualWriteFieldName(PropertyDescriptor<?> pd) {
 		return pd.getFieldName();
+	}
+
+	@Override
+	protected boolean canUseBeanAnnotation() {
+		return false;
 	}
 
 }

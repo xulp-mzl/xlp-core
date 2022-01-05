@@ -1,19 +1,25 @@
 package org.xlp.javabean.convert.mapandbean;
 
-import org.xlp.javabean.JavaBeanPropertiesDescriptor;
-import org.xlp.javabean.PropertyDescriptor;
-import org.xlp.javabean.annotation.Formatter;
-import org.xlp.javabean.config.DateFormatConfig;
-import org.xlp.javabean.processer.ValueProcesser;
-import org.xlp.utils.*;
-import org.xlp.utils.collection.XLPCollectionUtil;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.xlp.javabean.JavaBeanPropertiesDescriptor;
+import org.xlp.javabean.MethodException;
+import org.xlp.javabean.PropertyDescriptor;
+import org.xlp.javabean.annotation.Bean;
+import org.xlp.javabean.annotation.Formatter;
+import org.xlp.javabean.config.DateFormatConfig;
+import org.xlp.javabean.processer.ValueProcesser;
+import org.xlp.utils.XLPDateUtil;
+import org.xlp.utils.XLPFormatterUtil;
+import org.xlp.utils.XLPOutputInfoUtil;
+import org.xlp.utils.XLPPackingTypeUtil;
+import org.xlp.utils.XLPStringUtil;
+import org.xlp.utils.collection.XLPCollectionUtil;
 
 /**
  * map与bean相互转换抽象类
@@ -143,19 +149,19 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 */
 	private T createBean(Map<String, ?> map, Class<T> cs,
 			PropertyDescriptor<T>[] pds) {
+		if (canUseBeanAnnotation() && cs.getAnnotation(Bean.class) == null) { 
+			throw new RuntimeException("要实例化的类没有@Bean注解，创建对象失败！");
+		}
 
 		T bean = newInstance(cs);
 
 		for (Entry<String, ?> entry : map.entrySet()) {
-			if (entry != null) {
-				String key = entry.getKey();
-
-				for (int i = 0; i < pds.length; i++) {
-					if (key != null
-							&& key.equalsIgnoreCase(virtualWriteFieldName(pds[i]))) {
-						callSetter(entry.getValue(), bean, pds[i]);
-						break;
-					}
+			String key;
+			if (entry != null && !XLPStringUtil.isEmpty(key = entry.getKey())) { 
+				try {
+					_createBean(key, bean, pds, entry.getValue());
+				} catch (Exception e) {
+					XLPOutputInfoUtil.println("值设置异常，" + e.getMessage());
 				}
 			}
 		}
@@ -164,12 +170,59 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	}
 
 	/**
+	 * 深度创建bean
+	 * 
+	 * @param fieldName
+	 * @param bean
+	 * @param pds
+	 * @param value
+	 * @throws MethodException 
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void _createBean(String fieldName, Object bean, PropertyDescriptor<?>[] pds, Object value) throws Exception {
+		int dotIndex = fieldName.indexOf(".");
+		PropertyDescriptor<Object> pd = null;
+		for (int i = 0; i < pds.length; i++) {
+			if (fieldName.equalsIgnoreCase(virtualWriteFieldName(pds[i]))) {
+				pd = (PropertyDescriptor<Object>) pds[i];
+				break;
+			}
+		}
+		
+		if (pd != null) {
+			_callSetter(value, bean, (PropertyDescriptor<Object>) pd);
+		} else if (dotIndex >= 0) {
+			String prefixName = fieldName.substring(0, dotIndex); 
+			for (int i = 0; i < pds.length; i++) {
+				if (prefixName.equalsIgnoreCase(virtualWriteFieldName(pds[i]))) {
+					pd = (PropertyDescriptor<Object>) pds[i];
+					break;
+				}
+			}
+			if (pd != null) {
+				Object _bean = pd.executeReadMethod(bean);
+				Class<?> _beanClass = pd.getFiledClassType();
+				//判断是否需要创建bean
+				if (canUseBeanAnnotation() && _beanClass.getAnnotation(Bean.class) == null) {
+					return;
+				}
+				if (_bean == null ) {
+					_bean = _beanClass.newInstance();
+					pd.executeWriteMethod(bean, _bean); 
+				}
+				pds = new JavaBeanPropertiesDescriptor(_beanClass).getPds();
+				_createBean(fieldName.substring(dotIndex + 1), _bean, pds, value);
+			}
+		} 
+	}
+
+	/**
 	 * 用指定的属性描述器获取其对应的字段名(bean->map是字段名映射)
 	 * 
 	 * @param pd
 	 * @return
 	 */
-	protected abstract String virtualReadFieldName(PropertyDescriptor<T> pd);
+	protected abstract String virtualReadFieldName(PropertyDescriptor<?> pd);
 	
 	/**
 	 * 用指定的属性描述器获取其对应的字段名(map->bean是字段名映射)
@@ -177,7 +230,14 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 * @param pd
 	 * @return
 	 */
-	protected abstract String virtualWriteFieldName(PropertyDescriptor<T> pd);
+	protected abstract String virtualWriteFieldName(PropertyDescriptor<?> pd);
+	
+	/**
+	 * 标记是否用{@link Bean}注解判断是否是JavaBean
+	 * 
+	 * @return
+	 */
+	protected abstract boolean canUseBeanAnnotation();
 
 	/**
 	 * 调用bean的某个属性的写方法
@@ -187,7 +247,25 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 * @param pd
 	 *            属性描述
 	 */
+	@SuppressWarnings("unchecked")
 	public void callSetter(Object value, T bean, PropertyDescriptor<T> pd) {
+		try {
+			_callSetter(value, bean, (PropertyDescriptor<Object>) pd);
+		} catch (MethodException e) {
+			XLPOutputInfoUtil.println(pd.getFieldName() + "的值设置异常，" + e.getMessage());
+		} 
+	}
+	
+	/**
+	 * 调用bean的某个属性的写方法
+	 * 
+	 * @param value
+	 * @param bean
+	 * @param pd
+	 *            属性描述
+	 * @throws MethodException 
+	 */
+	private void _callSetter(Object value, Object bean, PropertyDescriptor<Object> pd) throws MethodException {
 		Class<?> fieldType = pd.getFiledClassType();
 		if (value != null){
 			// 对给定的值处理成适合bean字段的属性值
@@ -220,11 +298,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 			value = ValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
 		}
 
-		try {
-			pd.executeWriteMethod(bean, value);
-		} catch (Exception e) {
-			XLPOutputInfoUtil.println(pd.getFieldName() + "的值设置异常，" + e.getMessage());
-		}
+		pd.executeWriteMethod(bean, value);
 	}
 
 	/**

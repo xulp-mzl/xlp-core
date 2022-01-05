@@ -65,7 +65,7 @@ public class MapBeanConverter<T> extends MapBeanAbstract<T>{
 		super(processer);
 	}
 	
-	private String virtualFieldName(PropertyDescriptor<T> pd) {
+	private String virtualFieldName(PropertyDescriptor<?> pd) {
 		String virtualFieldName = null;
 		FieldName mapKeyName = pd.getFieldAnnotation(FieldName.class);
 		if(mapKeyName != null) {
@@ -80,13 +80,18 @@ public class MapBeanConverter<T> extends MapBeanAbstract<T>{
 	}
 
 	@Override
-	protected String virtualReadFieldName(PropertyDescriptor<T> pd) {
+	protected String virtualReadFieldName(PropertyDescriptor<?> pd) {
 		return virtualFieldName(pd);
 	}
 
 	@Override
-	protected String virtualWriteFieldName(PropertyDescriptor<T> pd) {
+	protected String virtualWriteFieldName(PropertyDescriptor<?> pd) {
 		return virtualFieldName(pd);
+	}
+
+	@Override
+	protected boolean canUseBeanAnnotation() {
+		return true;
 	}
 
 }
