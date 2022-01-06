@@ -1162,7 +1162,7 @@ public final class JsonObject extends Json{
 	}
 	
 	/**
-	 * 深度创建bean
+	 * 深度设置bean属性
 	 * 
 	 * @param fieldName
 	 * @param bean
