@@ -176,7 +176,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 	 * @param bean
 	 * @param pds
 	 * @param value
-	 * @throws MethodException 
+	 * @throws Exception 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void _createBean(String fieldName, Object bean, PropertyDescriptor<?>[] pds, Object value) throws Exception {

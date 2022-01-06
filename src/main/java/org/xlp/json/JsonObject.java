@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.xlp.assertion.AssertUtils;
 import org.xlp.javabean.JavaBeanPropertiesDescriptor;
 import org.xlp.javabean.PropertyDescriptor;
 import org.xlp.javabean.annotation.Bean;
@@ -69,7 +69,7 @@ public final class JsonObject extends Json{
 		if (keyIsOrder) {
 			this.map = new LinkedHashMap<String, Object>();
 		}else {
-			this.map = new ConcurrentHashMap<String, Object>();
+			this.map = new HashMap<String, Object>();
 		}
 	}
 
@@ -1063,10 +1063,7 @@ public final class JsonObject extends Json{
 		FieldName fieldName;
 		String keyName = null;
 		Object value = null;
-		Class<?> fieldType;
 		String tempFieldName;
-		//json字段格式化模式
-		Formatter jsonFormatter;
 		for (PropertyDescriptor<T> pd : pds) {
 			if (isUsedAnnotation) {
 				fieldName = pd.getFieldAnnotation(FieldName.class);
@@ -1078,26 +1075,8 @@ public final class JsonObject extends Json{
 				keyName = pd.getFieldName();
 			}
 			if (keyName != null) { 
-				fieldType = pd.getFiledClassType();
 				try {
-					if(List.class.isAssignableFrom(fieldType)){
-						Class<?> actualType = (Class<?>) ((ParameterizedType)pd.getField().getGenericType())
-								.getActualTypeArguments()[0];
-						value = getJsonElement(keyName).getCollectionBean(actualType, Flag.list);
-					}else if (Set.class.isAssignableFrom(fieldType)) {
-						Class<?> actualType = (Class<?>) ((ParameterizedType)pd.getField().getGenericType())
-							.getActualTypeArguments()[0];
-						value = getJsonElement(keyName).getCollectionBean(actualType, Flag.set);
-					}else {
-						jsonFormatter = pd.getFieldAnnotation(Formatter.class);
-						
-						JsonElement jsonElement = getJsonElement(keyName);
-						jsonElement.setFormatter(jsonFormatter);
-						value = new JsonValueProcesser().processValue(fieldType, jsonElement);
-						
-						if(value == null && fieldType.isPrimitive())
-							value = JsonValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
-					}
+					value = getConvertBeanValue(getJsonElement(keyName), pd); 
 				} catch (Exception e) {
 					XLPOutputInfoUtil.println("----------调用[" + pd.getFieldName() + " ]该字段的写方法失败---------");
 				}
@@ -1106,6 +1085,150 @@ public final class JsonObject extends Json{
 		}
 		
 		return bean;
+	}
+
+	/**
+	 * 获取转换bean对应属性值
+	 * 
+	 * @param jsonElement
+	 * @param pd
+	 * @return
+	 */
+	private <T> Object getConvertBeanValue(JsonElement jsonElement, PropertyDescriptor<T> pd) {
+		Object value;
+		Class<?> fieldType;
+		//json字段格式化模式
+		Formatter jsonFormatter;
+		fieldType = pd.getFiledClassType();
+		if(List.class.isAssignableFrom(fieldType)){
+			Class<?> actualType = (Class<?>) ((ParameterizedType)pd.getField().getGenericType())
+					.getActualTypeArguments()[0];
+			value = jsonElement.getCollectionBean(actualType, Flag.list);
+		}else if (Set.class.isAssignableFrom(fieldType)) {
+			Class<?> actualType = (Class<?>) ((ParameterizedType)pd.getField().getGenericType())
+				.getActualTypeArguments()[0];
+			value = jsonElement.getCollectionBean(actualType, Flag.set);
+		}else {
+			jsonFormatter = pd.getFieldAnnotation(Formatter.class);
+			
+			jsonElement.setFormatter(jsonFormatter);
+			value = new JsonValueProcesser().processValue(fieldType, jsonElement);
+			
+			if(value == null && fieldType.isPrimitive())
+				value = JsonValueProcesser.PRIMITIVE_DEFAULTS.get(fieldType);
+		}
+		return value;
+	}
+	
+	//TODO
+	/**
+	 * 把JsonObject对象转换成bean对象(处理带.的key值json转换成JavaBean)
+	 * 
+	 * @param beanClass
+	 * @return
+	 * @throws NullPointerException
+	 * 			假如参数为null，抛出该异常
+	 */
+	public <T> T toBeanExt(Class<T> beanClass){
+		return toBeanExt(beanClass, true);
+	}
+	
+	/**
+	 * 把JsonObject对象转换成bean对象(处理带.的key值json转换成JavaBean)
+	 * 
+	 * @param beanClass
+	 * @param isUsedAnnotation
+	 *            是否启用FieldName注解转换 true是，false不启用
+	 * @return
+	 * @throws NullPointerException
+	 * 			假如参数为null，抛出该异常
+	 */
+	public <T> T toBeanExt(Class<T> beanClass, boolean isUsedAnnotation){
+		AssertUtils.isNotNull(beanClass, "beanClass参数必须不为null");
+		PropertyDescriptor<T>[] pds = new JavaBeanPropertiesDescriptor<T>(beanClass)
+				.getPds();
+		T bean = BeanUtil.newInstance(beanClass);
+		Set<String> keys = keySet();
+		for (String key : keys) {
+			if (!XLPStringUtil.isEmpty(key)) { 
+				try {
+					_setBeanValue(key, bean, pds, getJsonElement(key), isUsedAnnotation);
+				} catch (Exception e) {
+					XLPOutputInfoUtil.println("----------函数(toBeanExt)设置[" + beanClass + "." + key + " ]该字段值失败:" + e.getMessage() + "---------");
+				} 
+			}
+		}
+		return bean;
+	}
+	
+	/**
+	 * 深度创建bean
+	 * 
+	 * @param fieldName
+	 * @param bean
+	 * @param pds
+	 * @param jsonElement
+	 * @param isUsedAnnotation
+	 *            是否启用FieldName注解转换 true是，false不启用
+	 * @throws Exception 
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void _setBeanValue(String fieldName, Object bean, PropertyDescriptor<?>[] pds, JsonElement jsonElement,
+			boolean isUsedAnnotation) throws Exception {
+		int dotIndex = fieldName.indexOf(".");
+		PropertyDescriptor<Object> pd = null;
+		for (int i = 0; i < pds.length; i++) {
+			if (fieldName.equalsIgnoreCase(getBeanFiledName(pds[i], isUsedAnnotation))) {
+				pd = (PropertyDescriptor<Object>) pds[i];
+				break; 
+			}
+		}
+		
+		if (pd != null) {
+			pd.executeWriteMethod(bean, getConvertBeanValue(jsonElement, pd)); 
+		} else if (dotIndex >= 0) {
+			String prefixName = fieldName.substring(0, dotIndex); 
+			for (int i = 0; i < pds.length; i++) {
+				if (prefixName.equalsIgnoreCase(getBeanFiledName(pds[i], isUsedAnnotation))) {
+					pd = (PropertyDescriptor<Object>) pds[i];
+					break;
+				}
+			}
+			if (pd != null) {
+				Object _bean = pd.executeReadMethod(bean);
+				Class<?> _beanClass = pd.getFiledClassType();
+				//判断是否需要创建bean
+				if (isUsedAnnotation && _beanClass.getAnnotation(Bean.class) == null) {
+					return;
+				}
+				if (_bean == null ) {
+					_bean = _beanClass.newInstance();
+					pd.executeWriteMethod(bean, _bean); 
+				}
+				pds = new JavaBeanPropertiesDescriptor(_beanClass).getPds();
+				_setBeanValue(fieldName.substring(dotIndex + 1), _bean, pds, jsonElement, isUsedAnnotation);
+			}
+		} 
+	}
+	
+	/**
+	 * 根据PropertyDescriptor对象获取字段名称
+	 * 
+	 * @param pd
+	 * @param isUsedAnnotation 是否启用FieldName注解转换 true是，false不启用
+	 * @return
+	 */
+	private <T> String getBeanFiledName(PropertyDescriptor<T> pd, boolean isUsedAnnotation){
+		if (isUsedAnnotation) {
+			FieldName fieldNameAnnotation = pd.getFieldAnnotation(FieldName.class);
+			if (fieldNameAnnotation != null) {
+				String name = fieldNameAnnotation.name();
+				name = XLPStringUtil.isEmpty(name) ? pd.getFieldName() : name.trim();
+				return name;
+			}
+			return null;
+		}
+		return pd.getFieldName();
 	}
 	
 	/**
@@ -1216,5 +1339,14 @@ public final class JsonObject extends Json{
 	 */
 	public String getLastKey(){
 		return getKey(count() - 1);
+	}
+	
+	/**
+	 * 返回JsonObject对象的key集合
+	 * 
+	 * @return
+	 */
+	public Set<String> keySet(){
+		return map.keySet();
 	}
 }
