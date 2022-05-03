@@ -827,8 +827,8 @@ public final class JsonObject extends Json{
 				jsonFormatter = pd.getFieldAnnotation(Formatter.class);
 				Class<?> fieldType = pd.getFiledClassType();
 				Object value = BeanUtil.callGetter(bean, pd);
-				//防止泛型类型，导致字段实际类型不准确问题
-				fieldType = value == null ? fieldType : value.getClass();
+				//处理bean字段类型为Object时，导致字段实际类型不准确问题
+				fieldType = value != null && Object.class == fieldType ? value.getClass() : fieldType;
 				JsonElement jsonElement = new JsonElement(fieldType, value, 
 						pd.getFiledClassType().getAnnotation(Bean.class) != null, 
 						isUsedAnnotation, jsonConfig, jsonFormatter);
