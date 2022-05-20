@@ -1,4 +1,7 @@
 package org.xlp.utils;
+
+import java.util.Date;
+
 /**
  * <p>创建时间：2021年5月28日 下午10:48:41</p>
  * @author xlp
@@ -12,7 +15,8 @@ public class XLPOutputInfoUtil {
 	 * @param msg
 	 */
 	public static void println(String msg){
-		System.out.println(msg == null ? "null" : msg);
+		System.out.println(XLPDateUtil.dateToString(new Date()) 
+				+ "："  + (msg == null ? "null" : msg));
 	}
 	
 	/**
@@ -23,7 +27,7 @@ public class XLPOutputInfoUtil {
 	 */
 	public static void println(String msg, Throwable throwable){
 		if (!XLPStringUtil.isEmpty(msg)) {
-			System.out.println(msg);
+			System.out.println(XLPDateUtil.dateToString(new Date()) + "：" + msg);
 		}
 		if (throwable != null) {
 			throwable.printStackTrace();
@@ -48,7 +52,8 @@ public class XLPOutputInfoUtil {
      * @param object
      */
     public static void println(Object object) {
-    	System.out.println(object == null ? "null" : object.toString());
+    	System.out.println(XLPDateUtil.dateToString(new Date()) + "：" 
+    			+ (object == null ? "null" : object.toString()));
     }
     
     /**
@@ -57,6 +62,7 @@ public class XLPOutputInfoUtil {
      * @param object
      */
     public static void println(String msg, Object... values) {
-    	System.out.println(msg == null ? "null" : String.format(msg, values)); 
+    	System.out.println(XLPDateUtil.dateToString(new Date()) + "：" 
+    			+ (msg == null ? "null" : String.format(msg, values))); 
     }
 }
