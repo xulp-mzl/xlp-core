@@ -115,4 +115,14 @@ public class XLPBooleanUtil {
 			return null;
 		return valueOf(v.toString());
 	}
+	
+	/**
+	 * 判断给定的类是否是boolean 或Boolean
+	 * 
+	 * @param cs
+	 * @return
+	 */
+	public static boolean isBoolean(Class<?> cs){
+		return cs == Boolean.TYPE || cs == Boolean.class;
+	}
 }
