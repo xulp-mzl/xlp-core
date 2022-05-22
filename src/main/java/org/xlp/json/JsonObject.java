@@ -1068,6 +1068,7 @@ public final class JsonObject extends Json{
 		Object value = null;
 		String tempFieldName;
 		for (PropertyDescriptor<T> pd : pds) {
+			keyName = null;
 			if (isUsedAnnotation) {
 				fieldName = pd.getFieldAnnotation(FieldName.class);
 				if (fieldName != null) {
