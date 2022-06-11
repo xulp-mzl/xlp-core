@@ -444,4 +444,19 @@ public class XLPDateUtil {
 				|| dateObject instanceof LocalDate || dateObject instanceof LocalTime
 				|| dateObject instanceof Long || dateObject instanceof Calendar);
 	}
+	
+	/**
+	 * 判断给定的类是否是时间类(即为:Date, LocalDateTime, LocalDate, LocalTime, Calendar)
+	 * 
+	 * @param dateClass
+	 * @return 假如参数为null或不是时间类返回false，否则返回true
+	 */
+	public static boolean isDate(Class<?> dateClass){
+		if (dateClass == null) {
+			return false;
+		}
+		return (Date.class.isAssignableFrom(dateClass) || dateClass == LocalDateTime.class
+				|| dateClass == LocalDate.class || dateClass == LocalTime.class
+				|| dateClass == Calendar.class);
+	}
 }
