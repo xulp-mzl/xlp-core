@@ -287,6 +287,9 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 						ValueProcesser processer = new MapValueProcesser(dateFormatConfig);
 						value = processer.processValue(fieldType, value);
 					}
+				} else if (value != null && fieldType.isEnum()) {
+					//处理枚举类型映射问题
+					value = fieldType.getMethod("valueOf", String.class).invoke(fieldType, value.toString());
 				} else {
 					value = processer.processValue(fieldType, value);
 				}

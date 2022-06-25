@@ -1097,8 +1097,9 @@ public final class JsonObject extends Json{
 	 * @param jsonElement
 	 * @param pd
 	 * @return
+	 * @throws Exception 
 	 */
-	private <T> Object getConvertBeanValue(JsonElement jsonElement, PropertyDescriptor<T> pd) {
+	private <T> Object getConvertBeanValue(JsonElement jsonElement, PropertyDescriptor<T> pd) throws Exception {
 		Object value;
 		Class<?> fieldType;
 		//json字段格式化模式
@@ -1112,6 +1113,12 @@ public final class JsonObject extends Json{
 			Class<?> actualType = (Class<?>) ((ParameterizedType)pd.getField().getGenericType())
 				.getActualTypeArguments()[0];
 			value = jsonElement.getCollectionBean(actualType, Flag.set);
+		}else if (fieldType.isEnum()) {
+			value = jsonElement.getValue();
+			if (value != null) {
+				//处理枚举类型映射问题
+				value = fieldType.getMethod("valueOf", String.class).invoke(fieldType, value.toString());
+			}
 		}else {
 			jsonFormatter = pd.getFieldAnnotation(Formatter.class);
 			
