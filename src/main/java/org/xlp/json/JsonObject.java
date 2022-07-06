@@ -830,7 +830,7 @@ public final class JsonObject extends Json{
 				//处理bean字段类型为Object时，导致字段实际类型不准确问题
 				fieldType = value != null && Object.class == fieldType ? value.getClass() : fieldType;
 				JsonElement jsonElement = new JsonElement(fieldType, value, 
-						pd.getFiledClassType().getAnnotation(Bean.class) != null, 
+						fieldType.getAnnotation(Bean.class) != null, 
 						isUsedAnnotation, jsonConfig, jsonFormatter);
 				jsonObject.putElement(fnAlias, jsonElement);
 			}
