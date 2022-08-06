@@ -26,7 +26,6 @@ public class SpecialCharacterConfig {
 	
 	static {
 		//转义字符映射关系
-		ESCAPE_CHARACTER_MAP.put("\\","\\\\");
 		ESCAPE_CHARACTER_MAP.put(JsonUtil.DOUBLE_QUOTES,"\\\"");
 		ESCAPE_CHARACTER_MAP.put("\n","\\\n");
 		ESCAPE_CHARACTER_MAP.put("\r","\\\r");
@@ -37,6 +36,7 @@ public class SpecialCharacterConfig {
 		if(original == null)
 			return null;
 		if(open){
+			original = original.replace("\\","\\\\");
 			for (Entry<String, String> entry : ESCAPE_CHARACTER_MAP.entrySet()) {
 				original = original.replace(entry.getKey(), entry.getValue());
 			}
@@ -58,6 +58,7 @@ public class SpecialCharacterConfig {
 			for (Entry<String, String> entry : ESCAPE_CHARACTER_MAP.entrySet()) {
 				optString = optString.replace(entry.getValue(), entry.getKey());
 			}
+			optString.replace("\\\\","\\");
 		}
 		return optString; 
 	}
