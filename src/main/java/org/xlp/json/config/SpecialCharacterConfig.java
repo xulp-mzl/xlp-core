@@ -1,5 +1,9 @@
 package org.xlp.json.config;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.xlp.json.utils.JsonUtil;
 
 /**
@@ -10,16 +14,34 @@ import org.xlp.json.utils.JsonUtil;
  * @version 1.0
  */
 public class SpecialCharacterConfig {
-	//标记是否启用该功能,默认启用
+	/**
+	 * 标记是否启用该功能,默认启用
+	 */
 	private boolean open = true;
 	
-	private static final String DOUBLE_QUO = "\\\"";
+	/**
+	 * 存储转义字符映射关系，key：要转义的字符，value：转义后的字符
+	 */
+	private static final Map<String, String> ESCAPE_CHARACTER_MAP = new LinkedHashMap<String, String>();
+	
+	static {
+		//转义字符映射关系
+		ESCAPE_CHARACTER_MAP.put("\\","\\\\");
+		ESCAPE_CHARACTER_MAP.put(JsonUtil.DOUBLE_QUOTES,"\\\"");
+		ESCAPE_CHARACTER_MAP.put("\n","\\\n");
+		ESCAPE_CHARACTER_MAP.put("\r","\\\r");
+		ESCAPE_CHARACTER_MAP.put("\t","\\\t");
+	}
 	
 	public String toString(String original){
 		if(original == null)
 			return null;
-		return open ? original.replace("\\", "\\\\")
-				.replace(JsonUtil.DOUBLE_QUOTES, DOUBLE_QUO) : original; 
+		if(open){
+			for (Entry<String, String> entry : ESCAPE_CHARACTER_MAP.entrySet()) {
+				original = original.replace(entry.getKey(), entry.getValue());
+			}
+		}
+		return original;
 	}
 	
 	/**
@@ -31,8 +53,13 @@ public class SpecialCharacterConfig {
 	public String toRawString(String optString){
 		if(optString == null)
 			return null;
-		return open ? optString.replace("\\\\", "\\")
-				.replace(DOUBLE_QUO, JsonUtil.DOUBLE_QUOTES) : optString; 
+		
+		if(open){
+			for (Entry<String, String> entry : ESCAPE_CHARACTER_MAP.entrySet()) {
+				optString = optString.replace(entry.getValue(), entry.getKey());
+			}
+		}
+		return optString; 
 	}
 	
 	public SpecialCharacterConfig() {
@@ -40,5 +67,17 @@ public class SpecialCharacterConfig {
 
 	public SpecialCharacterConfig(boolean open) {
 		this.open = open;
+	}
+	
+	/**
+	 * 添加转义字符映射关系
+	 * 
+	 * @param soucre 要转义的字符
+	 * @param target 转义后的字符
+	 */
+	public static void add(String soucre, String target) {
+		if (soucre != null && target != null) {
+			ESCAPE_CHARACTER_MAP.put(soucre, target);
+		}
 	}
 }
