@@ -145,6 +145,7 @@ public class PropertyDescriptor<T> extends FieldDescriptor{
 	 * 执行写方法
 	 * 
 	 * @param obj 指定执行此对象的方法
+	 * @param param 方法参数值
 	 * @return
 	 * @throws MethodException 假如获执行写方法出错时，抛出该异常
 	 * @throws NullPointerException 假如参数为null，抛出该异常
