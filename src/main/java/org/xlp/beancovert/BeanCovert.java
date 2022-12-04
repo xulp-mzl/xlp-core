@@ -111,7 +111,7 @@ public class BeanCovert {
 				XLPOutputInfoUtil.println(e);
 			} catch (Exception e) {
 				if (covertFailThrow) {
-					throw new BeanConvertException("【" + fieldName + "】的字段复制失败，", e);
+					throw new BeanConvertException("两个bean字段类型不匹配，【" + fieldName + "】的字段复制失败，", e);
 				}
 				XLPOutputInfoUtil.println(e);
 			}
