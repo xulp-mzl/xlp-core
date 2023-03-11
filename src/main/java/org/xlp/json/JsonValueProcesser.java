@@ -87,7 +87,7 @@ class JsonValueProcesser extends ValueProcesser{
 			value = jsonElement.getTime();
 		} else if (fieldType.equals(Timestamp.class)) {
 			value = jsonElement.getTimestamp();
-		} else if (fieldType.isAssignableFrom(Calendar.class)) {
+		} else if (Calendar.class.isAssignableFrom(fieldType)) {
 			value = jsonElement.getCalendar();
 		} else if (JsonObject.class.equals(valueType) && !JsonObject.class.equals(fieldType)) {
 			value = ((JsonObject)value).toBean(fieldType, jsonElement.isUsedAnnotation());
@@ -101,11 +101,11 @@ class JsonValueProcesser extends ValueProcesser{
 			value = jsonElement.getBigInteger();
 		} else if (fieldType.equals(BigDecimal.class)) {
 			value = jsonElement.getBigDecimal();
-		} else if (fieldType.isAssignableFrom(Number.class)) {
+		} else if (Number.class.isAssignableFrom(fieldType)) {
 			value = jsonElement.getNumber();
-		} else if (fieldType.isAssignableFrom(List.class)) {
+		} else if (List.class.isAssignableFrom(fieldType)) {
 			value = jsonElement.getList();
-		} else if (fieldType.isAssignableFrom(Map.class)) {
+		} else if (Map.class.isAssignableFrom(fieldType)) {
 			value = jsonElement.getMap();
 		} else if (fieldType.equals(JsonObject.class)) {
 			value = jsonElement.getJsonObject(jsonElement.getJsonConfig());

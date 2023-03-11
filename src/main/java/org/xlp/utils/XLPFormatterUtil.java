@@ -107,7 +107,7 @@ public class XLPFormatterUtil {
 				&& XLPStringUtil.containSubString(pattern, "[yMmdHhs]")) {
 			return XLPDateUtil.stringDateToLong(parseStr, pattern);
 		}
-		if (XLPPackingTypeUtil.isNumberType(toClassObject) || toClassObject.isAssignableFrom(Number.class)) {
+		if (XLPPackingTypeUtil.isNumberType(toClassObject) || Number.class.isAssignableFrom(toClassObject)) {
 			if (toClassObject.equals(Integer.TYPE)
 					|| toClassObject.equals(Integer.class)) {
 				return parse(pattern, value).intValue();
@@ -148,7 +148,7 @@ public class XLPFormatterUtil {
 		if (toClassObject.equals(Timestamp.class)) {
 			return new Timestamp(XLPDateUtil.stringToDate(parseStr, pattern).getTime());
 		} 
-		if (toClassObject.isAssignableFrom(Calendar.class)) {
+		if (Calendar.class.isAssignableFrom(toClassObject)) {
 			Calendar calendar = Calendar.getInstance();
 			Date date = XLPDateUtil.stringToDate(parseStr, pattern);
 			calendar.setTime(date);

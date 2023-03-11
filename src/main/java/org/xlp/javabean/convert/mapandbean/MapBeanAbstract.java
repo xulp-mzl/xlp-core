@@ -279,7 +279,7 @@ public abstract class MapBeanAbstract<T> implements MapBean<T> {
 			try{
 				if (value != null && formatter != null
 						&& !XLPStringUtil.isEmpty(format = formatter.formatter())) {
-					if ((XLPPackingTypeUtil.isNumberType(fieldType) || fieldType.isAssignableFrom(Number.class))
+					if ((XLPPackingTypeUtil.isNumberType(fieldType) || Number.class.isAssignableFrom(fieldType))
 							&& CharSequence.class.isAssignableFrom(value.getClass())){
 						value = XLPFormatterUtil.parse(format, (CharSequence) value, fieldType);
 					} else {

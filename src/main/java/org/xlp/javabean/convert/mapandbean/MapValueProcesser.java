@@ -149,7 +149,7 @@ public class MapValueProcesser extends ValueProcesser{
 			}else if (fieldType.equals(Timestamp.class)) {
 				value = new Timestamp(XLPDateUtil.stringToDate((String) value, 
 						config.getDateTimeFormat()).getTime());
-			}else if (fieldType.isAssignableFrom(Calendar.class)) {
+			}else if (Calendar.class.isAssignableFrom(fieldType)) {
 				Date date = XLPDateUtil.stringToDate((String) value, 
 						config.getDateTimeFormat());
 				value = XLPDateUtil.dateToCalendar(date);
@@ -172,9 +172,9 @@ public class MapValueProcesser extends ValueProcesser{
 		}else if (fieldType.equals(BigInteger.class) && !valueType.equals(BigInteger.class)) {
 			value = new BigInteger(value.toString());
 		}else if (value instanceof Long) {
-			if (fieldType.isAssignableFrom(Date.class)){
+			if (Date.class.isAssignableFrom(fieldType)){
 				value = new Date((Long)value);
-			}else if (fieldType.isAssignableFrom(Calendar.class)) {
+			}else if (Calendar.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.longDateToCalendar((Long)value);
 			}else if (fieldType.equals(LocalDateTime.class)) {
 				Instant instant = Instant.ofEpochMilli((Long)value);
@@ -187,21 +187,21 @@ public class MapValueProcesser extends ValueProcesser{
 				value = instant.atZone(ZoneId.systemDefault()).toLocalTime();
 			}
 		}else if (value instanceof Date) {
-			if (fieldType.isAssignableFrom(LocalDateTime.class)) {
+			if (LocalDateTime.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.dateToLocalDateTime((Date) value);
-			}else if (fieldType.isAssignableFrom(Calendar.class)) {
+			}else if (Calendar.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.dateToCalendar((Date) value);
 			}
 		}else if (value instanceof LocalDateTime) {
-			if (fieldType.isAssignableFrom(Date.class)) {
+			if (Date.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.localDateTimeToDate((LocalDateTime) value);
-			}else if (fieldType.isAssignableFrom(Calendar.class)) {
+			}else if (Calendar.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.localDateTimeToCalendar((LocalDateTime) value);
 			}
 		}else if (value instanceof Calendar) {
-			if (fieldType.isAssignableFrom(Date.class)) {
+			if (Date.class.isAssignableFrom(fieldType)) {
 				value = ((Calendar)value).getTime();
-			}else if (fieldType.isAssignableFrom(LocalDateTime.class)) {
+			}else if (LocalDateTime.class.isAssignableFrom(fieldType)) {
 				value = XLPDateUtil.dateToLocalDateTime(((Calendar)value).getTime()); 
 			}
 		}
