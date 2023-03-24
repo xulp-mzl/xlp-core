@@ -2,6 +2,8 @@ package org.xlp.javabean;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * 字段描述
@@ -58,4 +60,19 @@ public class FieldDescriptor {
 		return field == null ? null : field.getType();
 	}
 	
+	/**
+	 * 获取字段类型泛型信息
+	 * @return 字段类型泛型信息，假如没有泛型信息，则返回空数组
+	 */
+	public Type[] getActualTypes(){
+		Type[] types = new Type[0];
+		if (field != null) {
+			// 获取字段类型泛型信息
+			Type type = field.getGenericType();
+			if (type instanceof ParameterizedType) {
+				types = ((ParameterizedType)type).getActualTypeArguments();
+			}
+		}
+		return types;
+	}
 }
